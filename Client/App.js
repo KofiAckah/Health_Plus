@@ -1,24 +1,12 @@
 import "./global.css";
-import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
+import { SafeAreaView, StatusBar } from "react-native";
+import StackScren from "./src/Screens/StackScren";
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <Text className="text-red-500">
-        Open up App.js to start working on your app!
-      </Text>
-      <StatusBar style="auto" />
-    </View>
+    <SafeAreaView className="flex-1">
+      <StatusBar barStyle="dark-content" backgroundColor={"white"} />
+      <StackScren />
+    </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
