@@ -1,10 +1,6 @@
 import { User } from "../Models/UserSchema.js";
-
-const isPasswordStrong = (password) => {
-  const passwordRegex =
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
-  return passwordRegex.test(password);
-};
+import { isPasswordStrong, generateOTP } from "../Config/Default.js";
+import { sendVerificationEmail } from "../Config/Mail.js";
 
 export const SignUp = async (req, res) => {
   try {
@@ -28,6 +24,7 @@ export const SignUp = async (req, res) => {
     if (password !== confirmPassword) {
       return res.status(400).json({ msg: "Passwords do not match" });
     }
+    const OTP = generateOTP();
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
@@ -38,8 +35,25 @@ export const SignUp = async (req, res) => {
         name,
         email,
         password,
+        OTP,
       });
       await newUser.save();
+
+      // Schedule OTP deletion after 10 minutes
+      setTimeout(async () => {
+        try {
+          await User.updateOne({ email }, { $set: { OTP: null } });
+          console.log(`OTP for ${email} has been deleted and set to null.`);
+        } catch (error) {
+          console.error(`Failed to delete OTP for ${email}:`, error);
+        }
+      }, 10 * 60 * 1000);
+
+      // Send verification email
+      // -------------------------------------
+      // Uncomment the following line to send verification email since I am coding
+      // await sendVerificationEmail(email, OTP);
+      // -------------------------------------
       return res.status(201).json({ msg: "User registered successfully" });
     }
   } catch (error) {
