@@ -52,7 +52,7 @@ export const SignUp = async (req, res) => {
       // Send verification email
       // -------------------------------------
       // Uncomment the following line to send verification email since I am coding
-      // await sendVerificationEmail(email, OTP);
+      await sendVerificationEmail(email, OTP);
       // -------------------------------------
       return res.status(201).json({ msg: "User registered successfully" });
     }

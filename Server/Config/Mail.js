@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const sendMail = async (email, otp, subject, title, message) => {
+const sendMail = async (email, subject, title, message) => {
   try {
     const transporter = nodemailer.createTransport({
       service: "gmail",
@@ -17,7 +17,7 @@ const sendMail = async (email, otp, subject, title, message) => {
       to: email,
       subject: subject,
       text: title,
-      html: message + otp,
+      html: message,
     };
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
@@ -35,6 +35,6 @@ const sendMail = async (email, otp, subject, title, message) => {
 export const sendVerificationEmail = async (email, otp) => {
   const subject = "Verify your account";
   const title = "Account Verification";
-  const message = `<h1>Welcome to our HealthPlus!</h1><p>Your OTP is: `;
-  await sendMail(email, otp, subject, title, message);
+  const message = `<h1>Welcome to our HealthPlus!</h1><p>Your OTP is: <strong>${otp}</strong></p> <p>OTP would be deleted after 10 minutes.</p>`;
+  await sendMail(email, subject, title, message);
 };
