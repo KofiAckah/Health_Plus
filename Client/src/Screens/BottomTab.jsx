@@ -35,13 +35,31 @@ const BottomTab = () => {
             <FontAwesomeIcon
               icon={iconName}
               size={(size = focused ? 28 : 22)}
-              color={(color = focused ? "#f46e0b" : "#7e7e7e")}
+              color={(color = focused ? "#f5f5f5" : "#cbeef3")}
             />
           );
         },
-        tabBarShowLabel: false,
-        tabBarActiveBackgroundColor: "#262626",
-        tabBarInactiveBackgroundColor: "#011627",
+        tabBarLabelStyle: {
+          color: "#f5f5f5",
+          fontSize: 11,
+          fontWeight: "bold",
+          fontFamily: "San-Serif",
+          textAlign: "center",
+        },
+        tabBarActiveBackgroundColor: "#f26a8d",
+        tabBarInactiveBackgroundColor: "#f49cbb",
+        headerShown: false,
+        tabBarStyle: {
+          position: "absolute",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          elevation: 0,
+          height: 53,
+          borderRadius: 20,
+          marginBottom: 7,
+          marginHorizontal: 7,
+        },
       })}
     >
       <Tab.Screen name="Emergency" component={Emergency} />
