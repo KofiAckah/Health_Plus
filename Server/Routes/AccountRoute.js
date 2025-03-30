@@ -5,8 +5,8 @@ import {
   VerifyOTP,
   Login,
   Logout,
-  dashboard,
 } from "../Controllers/AccountController.js";
+// import authMiddleware from "../Middleware/auth.js";
 
 const router = express.Router();
 
@@ -18,6 +18,5 @@ router.post("/request-otp", RequestOTP);
 router.post("/verify-otp", VerifyOTP);
 router.post("/login", Login);
 router.get("/logout", Logout);
-router.get("/dashboard", dashboard);
 
 export default router;

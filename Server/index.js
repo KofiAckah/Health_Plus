@@ -3,8 +3,10 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import fileUpload from "express-fileupload";
 
 import accountRoutes from "./Routes/AccountRoute.js";
+import profileRoutes from "./Routes/ProfileRoute.js";
 
 dotenv.config();
 
@@ -13,12 +15,14 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors());
+app.use(fileUpload());
 
 // Routes
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 app.use("/account", accountRoutes);
+app.use("/profile", profileRoutes);
 
 mongoose
   .connect(process.env.MONGODB_URI)

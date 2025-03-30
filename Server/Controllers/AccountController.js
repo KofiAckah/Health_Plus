@@ -165,6 +165,13 @@ export const Login = async (req, res) => {
       expiresIn: "1h",
     });
 
+    // Set token as a cookie
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // Use secure cookies in production
+      sameSite: "strict",
+    });
+
     return res.status(200).json({ msg: "Login successful", token });
   } catch (error) {
     console.error("Error in Login:", error);
@@ -178,15 +185,6 @@ export const Logout = async (req, res) => {
     return res.status(200).json({ msg: "Logout successful" });
   } catch (error) {
     console.error("Error in Logout:", error);
-    res.status(500).json({ msg: "Internal Server Error" });
-  }
-};
-
-export const dashboard = async (req, res) => {
-  try {
-    res.status(200).json({ msg: "Dashboard" });
-  } catch (error) {
-    console.error("Error in dashboard:", error);
     res.status(500).json({ msg: "Internal Server Error" });
   }
 };
