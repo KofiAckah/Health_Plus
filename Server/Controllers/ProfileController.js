@@ -19,6 +19,52 @@ export const GetProfile = async (req, res) => {
   }
 };
 
+export const UpdateProfile = async (req, res) => {
+  try {
+    const userId = req.user.id; // Assuming you have the user ID from the auth middleware
+
+    // Find the user by ID and exclude sensitive fields
+    const user = await User.findById(userId).select("-password -OTP -__v");
+    if (!user) {
+      return res.status(404).json({ msg: "User not found" });
+    }
+
+    const { name, phone, gender, location, hometown, bio } = req.body;
+
+    // Update fields, keeping existing values if not provided
+    user.name = name !== undefined ? name : user.name;
+    user.phone = phone !== undefined ? phone : user.phone;
+    user.gender = gender !== undefined ? gender : user.gender;
+    user.location = location !== undefined ? location : user.location;
+    user.hometown = hometown !== undefined ? hometown : user.hometown;
+    user.bio = bio !== undefined ? bio : user.bio;
+
+    // Handle profile picture upload
+    if (req.files && req.files.profilePicture) {
+      const profilePicture = req.files.profilePicture;
+      const imageUrl = await uploadHandler(profilePicture);
+      user.profilePicture = imageUrl;
+    }
+
+    // Save the updated user
+    await user.save();
+
+    // Convert user to object and remove sensitive fields
+    const userObj = user.toObject();
+    delete userObj.password;
+    delete userObj.OTP;
+
+    return res
+      .status(200)
+      .json({ msg: "Profile updated successfully", user: userObj });
+  } catch (error) {
+    console.error("Error updating profile:", error);
+    res
+      .status(500)
+      .json({ msg: "Internal Server Error", error: error.message });
+  }
+};
+
 // Checking if uploading image to cloudinary is working or not
 export const UploadImage = async (req, res) => {
   try {
