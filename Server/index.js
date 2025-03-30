@@ -1,6 +1,9 @@
 import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+
 import accountRoutes from "./Routes/AccountRoute.js";
 
 dotenv.config();
@@ -8,6 +11,8 @@ dotenv.config();
 const app = express();
 
 app.use(express.json());
+app.use(cookieParser());
+app.use(cors());
 
 // Routes
 app.get("/", (req, res) => {

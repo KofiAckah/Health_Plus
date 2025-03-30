@@ -1,6 +1,11 @@
 import { User } from "../Models/UserSchema.js";
 import { isPasswordStrong, generateOTP } from "../Config/Default.js";
 import { sendVerificationEmail, requestAnotherOTP } from "../Config/Mail.js";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 export const SignUp = async (req, res) => {
   try {
@@ -52,7 +57,7 @@ export const SignUp = async (req, res) => {
       // Send verification email
       // -------------------------------------
       // Uncomment the following line to send verification email since I am coding
-      await sendVerificationEmail(email, OTP);
+      // await sendVerificationEmail(email, OTP);
       // -------------------------------------
       return res.status(201).json({ msg: "User registered successfully" });
     }
@@ -93,12 +98,95 @@ export const RequestOTP = async (req, res) => {
     // Send verification email
     // -------------------------------------
     // Uncomment the following line to send verification email since I am coding
-    await requestAnotherOTP(email, OTP);
+    // await requestAnotherOTP(email, OTP);
     // -------------------------------------
 
     return res.status(200).json({ msg: "OTP sent successfully" });
   } catch (error) {
     console.error("Error in RequestOTP:", error);
+    res.status(500).json({ msg: "Internal Server Error" });
+  }
+};
+
+export const VerifyOTP = async (req, res) => {
+  try {
+    const { email, OTP } = req.body;
+    if (!email || !OTP) {
+      return res.status(400).json({ msg: "Email and OTP are required" });
+    }
+
+    // Check if user exists
+    const existingUser = await User.findOne({ email });
+    if (!existingUser) {
+      return res.status(400).json({ msg: "User does not exist" });
+    }
+
+    // Check if OTP is valid
+    if (existingUser.OTP !== OTP) {
+      return res.status(400).json({ msg: "Invalid OTP" });
+    }
+
+    // Update user status to verified
+    await User.updateOne({ email }, { $set: { isVerified: true, OTP: null } });
+
+    return res.status(200).json({ msg: "OTP verified successfully" });
+  } catch (error) {
+    console.error("Error in VerifyOTP:", error);
+    res.status(500).json({ msg: "Internal Server Error" });
+  }
+};
+
+export const Login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ msg: "Email and password are required" });
+    }
+
+    // Check if user exists
+    const existingUser = await User.findOne({ email });
+    if (!existingUser) {
+      return res.status(400).json({ msg: "User does not exist" });
+    }
+
+    // Check if user is verified
+    if (!existingUser.isVerified) {
+      return res.status(400).json({ msg: "User is not verified" });
+    }
+
+    // Check if password is correct
+    const isMatch = await bcrypt.compare(password, existingUser.password);
+    if (!isMatch) {
+      return res.status(400).json({ msg: "Invalid credentials" });
+    }
+
+    // Generate JWT token
+    const token = jwt.sign({ id: existingUser._id }, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
+
+    return res.status(200).json({ msg: "Login successful", token });
+  } catch (error) {
+    console.error("Error in Login:", error);
+    res.status(500).json({ msg: "Internal Server Error" });
+  }
+};
+
+export const Logout = async (req, res) => {
+  try {
+    res.clearCookie("token");
+    return res.status(200).json({ msg: "Logout successful" });
+  } catch (error) {
+    console.error("Error in Logout:", error);
+    res.status(500).json({ msg: "Internal Server Error" });
+  }
+};
+
+export const dashboard = async (req, res) => {
+  try {
+    res.status(200).json({ msg: "Dashboard" });
+  } catch (error) {
+    console.error("Error in dashboard:", error);
     res.status(500).json({ msg: "Internal Server Error" });
   }
 };
