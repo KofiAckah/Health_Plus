@@ -35,6 +35,13 @@ const sendMail = async (email, subject, title, message) => {
 export const sendVerificationEmail = async (email, otp) => {
   const subject = "Verify your account";
   const title = "Account Verification";
-  const message = `<h1>Welcome to our HealthPlus!</h1><p>Your OTP is: <strong>${otp}</strong></p> <p>OTP would be deleted after 10 minutes.</p>`;
+  const message = `<h1>Welcome to HealthPlus!</h1><p>Your OTP is: <strong>${otp}</strong></p> <p>OTP would be deleted after 10 minutes.</p>`;
+  await sendMail(email, subject, title, message);
+};
+
+export const requestAnotherOTP = async (email, otp) => {
+  const subject = "Request another OTP";
+  const title = "Request another OTP";
+  const message = `<h1>HealthPlus!</h1><p>Your new OTP is: <strong>${otp}</strong></p> <p>OTP would be deleted after 10 minutes.</p>`;
   await sendMail(email, subject, title, message);
 };
