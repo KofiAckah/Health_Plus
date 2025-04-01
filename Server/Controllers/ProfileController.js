@@ -1,5 +1,6 @@
 import { User } from "../Models/UserSchema.js";
 import uploadHandler from "../Config/uploadHandler.js";
+import { deleteImage } from "../utils/cloundinary.js";
 
 export const GetProfile = async (req, res) => {
   try {
@@ -29,7 +30,15 @@ export const UpdateProfile = async (req, res) => {
       return res.status(404).json({ msg: "User not found" });
     }
 
-    const { name, phone, gender, location, hometown, bio } = req.body;
+    const {
+      name,
+      phone,
+      gender,
+      location,
+      hometown,
+      bio,
+      removeProfilePicture,
+    } = req.body;
 
     // Update fields, keeping existing values if not provided
     user.name = name !== undefined ? name : user.name;
@@ -39,11 +48,36 @@ export const UpdateProfile = async (req, res) => {
     user.hometown = hometown !== undefined ? hometown : user.hometown;
     user.bio = bio !== undefined ? bio : user.bio;
 
+    // Handle profile picture removal
+    if (removeProfilePicture === "true") {
+      if (user.profilePictureId) {
+        try {
+          await deleteImage(user.profilePictureId); // Delete the old image from Cloudinary
+        } catch (error) {
+          console.error("Error deleting old profile picture:", error);
+        }
+      }
+      user.profilePicture = ""; // Set profile picture to empty
+      user.profilePictureId = ""; // Clear the Cloudinary public ID
+    }
+
     // Handle profile picture upload
     if (req.files && req.files.profilePicture) {
       const profilePicture = req.files.profilePicture;
-      const imageUrl = await uploadHandler(profilePicture);
-      user.profilePicture = imageUrl;
+
+      // Delete the old profile picture from Cloudinary if it exists
+      if (user.profilePictureId) {
+        try {
+          await deleteImage(user.profilePictureId); // Use the stored publicId to delete the old image
+        } catch (error) {
+          console.error("Error deleting old profile picture:", error);
+        }
+      }
+
+      // Upload the new profile picture
+      const imageDetails = await uploadHandler(profilePicture);
+      user.profilePicture = imageDetails.url;
+      user.profilePictureId = imageDetails.public_id; // Save the new publicId
     }
 
     // Save the updated user

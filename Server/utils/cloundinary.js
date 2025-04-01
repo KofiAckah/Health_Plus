@@ -20,10 +20,19 @@ export async function uploadImage(imagePath) {
   try {
     const result = await cloudinary.uploader.upload(imagePath, options);
     return result;
-    // return result.secure_url; // Return the secure URL of the uploaded image
   } catch (error) {
     console.error("Error uploading image to Cloudinary:", error);
-    throw error; // Rethrow the error to handle it in the calling function
+    throw error;
+  }
+}
+
+export async function deleteImage(publicId) {
+  try {
+    const result = await cloudinary.uploader.destroy(publicId);
+    return result;
+  } catch (error) {
+    console.error("Error deleting image from Cloudinary:", error);
+    throw error;
   }
 }
 

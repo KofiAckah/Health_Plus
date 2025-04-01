@@ -25,7 +25,7 @@ const uploadHandler = async (file) => {
 
   const result = await uploadImage(uploadPath);
   fs.unlinkSync(uploadPath);
-  return result.secure_url;
+  return result;
 };
 
 export default uploadHandler;
