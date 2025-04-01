@@ -45,3 +45,10 @@ export const requestAnotherOTP = async (email, otp) => {
   const message = `<h1>HealthPlus!</h1><p>Your new OTP is: <strong>${otp}</strong></p> <p>OTP would be deleted after 10 minutes.</p>`;
   await sendMail(email, subject, title, message);
 };
+
+export const sendPasswordResetEmail = async (email, otp) => {
+  const subject = "Reset your password";
+  const title = "Password Reset";
+  const message = `<h1>HealthPlus!</h1><p>Your OTP for password reset is: <strong>${otp}</strong></p> <p>OTP would be deleted after 10 minutes.</p>`;
+  await sendMail(email, subject, title, message);
+};

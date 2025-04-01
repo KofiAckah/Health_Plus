@@ -3,6 +3,8 @@ import {
   SignUp,
   RequestOTP,
   VerifyOTP,
+  ForgotPassword,
+  ResetPassword,
   Login,
   Logout,
 } from "../Controllers/AccountController.js";
@@ -16,6 +18,8 @@ router.get("/", (req, res) => {
 router.post("/signup", SignUp);
 router.post("/request-otp", RequestOTP);
 router.post("/verify-otp", VerifyOTP);
+router.post("/forgot-password", ForgotPassword);
+router.post("/reset-password", ResetPassword);
 router.post("/login", Login);
 router.get("/logout", Logout);
 
