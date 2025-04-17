@@ -9,7 +9,7 @@
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/logo.png",
-      "backgroundColor": "#FF4242",
+      "backgroundColor": "#ef4444",
       "resizeMode": "contain"
     },
     "ios": {
@@ -17,7 +17,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/logo.png",
+        "foregroundImage": "./assets/splash-icon.png",
         "backgroundColor": "#ffffff"
       }
     },

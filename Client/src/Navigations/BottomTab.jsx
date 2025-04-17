@@ -9,10 +9,10 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 // Screens
-import Emergency from "./Emergency";
-import FirstAid from "./FirstAid";
-import Social from "./Social";
-import Profile from "./Profile";
+import Emergency from "../Screens/Emergency";
+import FirstAid from "../Screens/FirstAid";
+import Social from "../Screens/Social";
+import Profile from "../Screens/Profile";
 
 const Tab = createBottomTabNavigator();
 
@@ -46,8 +46,10 @@ const BottomTab = () => {
           fontFamily: "San-Serif",
           textAlign: "center",
         },
-        tabBarActiveBackgroundColor: "#f26a8d",
-        tabBarInactiveBackgroundColor: "#f49cbb",
+        // tabBarActiveBackgroundColor: "#f26a8d",
+        // tabBarInactiveBackgroundColor: "#f49cbb",
+        tabBarActiveBackgroundColor: "#ef4444",
+        tabBarInactiveBackgroundColor: "#f26a8d",
         headerShown: false,
         tabBarStyle: {
           position: "absolute",
@@ -58,7 +60,7 @@ const BottomTab = () => {
           height: 53,
           borderRadius: 20,
           marginBottom: 7,
-          marginHorizontal: 7,
+          marginHorizontal: 8,
         },
       })}
     >

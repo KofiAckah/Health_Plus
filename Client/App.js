@@ -1,6 +1,6 @@
 import "./global.css";
 import { SafeAreaView, StatusBar } from "react-native";
-import StackScren from "./src/Screens/StackScren";
+import StackScren from "./src/Navigations/StackScren";
 
 export default function App() {
   return (
