@@ -7,6 +7,7 @@ import fileUpload from "express-fileupload";
 
 import accountRoutes from "./Routes/AccountRoute.js";
 import profileRoutes from "./Routes/ProfileRoute.js";
+import issueRoutes from "./Routes/IssueRoute.js";
 
 dotenv.config();
 
@@ -23,6 +24,7 @@ app.get("/", (req, res) => {
 });
 app.use("/account", accountRoutes);
 app.use("/profile", profileRoutes);
+app.use("/issue", issueRoutes);
 
 mongoose
   .connect(process.env.MONGODB_URI)
