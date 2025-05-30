@@ -15,7 +15,18 @@ const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      "http://10.132.215.220:8081", // Metro bundler (web)
+      "http://10.132.215.220:19006", // Expo web (if used)
+      "http://10.132.215.220:5000", // Your backend (for direct API calls)
+      "exp://10.132.215.220:8081", // Expo Go app
+    ],
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    credentials: true,
+  })
+);
 app.use(fileUpload());
 
 // Routes

@@ -1,4 +1,3 @@
-import React from "react";
 import {
   View,
   Image,
@@ -17,54 +16,67 @@ const Login = () => {
   const navigation = useNavigation();
 
   return (
-    <View className="flex-1 bg-white">
-      <View className="flex w-full justify-center items-center my-7">
-        <Image source={Logo} className="w-32 h-28" />
-        <Text className="text-3xl mt-5 font-semibold">{CompanyName}</Text>
+    <ScrollView className="flex-1 bg-secondary-600">
+      <View className="bg-white rounded-b-[70px] pt-16 pb-24">
+        <View className="flex flex-row w-full justify-center items-center mb-14">
+          <Image source={Logo} className="w-20 h-20" />
+          <Text className="text-3xl ml-5 font-semibold">{CompanyName}</Text>
+        </View>
+        <View className="mx-5">
+          <Text className="text-2xl font-bold uppercase mb-4">Login</Text>
+          <View className="mt-5">
+            <Text className="text-gray-600 text-lg font-semibold">Email</Text>
+            <View className="flex flex-row items-center border-b border-secondary-600 py-2">
+              <FontAwesomeIcon icon={faUser} size={20} color="#F06A37" />
+              <TextInput
+                placeholder="Enter your email"
+                className="flex-1 ml-2"
+                keyboardType="email-address"
+              />
+            </View>
+          </View>
+          <View className="mt-5">
+            <Text className="text-gray-600 text-lg font-semibold">
+              Password
+            </Text>
+            <View className="flex flex-row items-center border-b border-secondary-600 py-2">
+              <FontAwesomeIcon icon={faLock} size={20} color="#F06A37" />
+              <TextInput
+                placeholder="Enter your password"
+                secureTextEntry
+                className="flex-1 ml-2"
+              />
+            </View>
+          </View>
+        </View>
       </View>
-      <View className="flex-1 justify-center items-center bg-secondary-500 w-full rounded-tl-[110px]">
-        <View className="w-full px-5">
-          <Text className="text-2xl font-semibold text-primary-500 mb-5 text-center">
+      <View className="flex justify-center items-center mb-10">
+        <TouchableOpacity
+          className="bg-white p-3 rounded-xl mt-14 mb-7 mx-auto w-[80%]"
+          onPress={() => navigation.navigate("Home")}
+        >
+          <Text className="text-secondary-600 text-center text-lg font-semibold">
             Login
           </Text>
-          <View className="flex flex-row items-center bg-white rounded-lg mb-4 px-3 py-2">
-            <FontAwesomeIcon icon={faUser} size={20} color="#f26a8d" />
-            <TextInput
-              placeholder="Username"
-              className="flex-1 ml-3 text-base text-gray-700"
-            />
-          </View>
-          <View className="flex flex-row items-center bg-white rounded-lg mb-4 px-3 py-2">
-            <FontAwesomeIcon icon={faLock} size={20} color="#f26a8d" />
-            <TextInput
-              placeholder="Password"
-              secureTextEntry={true}
-              className="flex-1 ml-3 text-base text-gray-700"
-            />
-          </View>
-          <TouchableOpacity
-            onPress={() => navigation.navigate("Home")}
-            className="bg-primary-500 rounded-lg py-3 mb-4"
-          >
-            <Text className="text-center text-white text-lg font-semibold">
-              Login
-            </Text>
-          </TouchableOpacity>
-        </View>
-        <View className="flex flex-row justify-center items-center mt-5">
-          <Text className="text-white text-base">Don't have an account?</Text>
-          <TouchableOpacity
-            onPress={() => navigation.navigate("Register")}
-            className="ml-2"
-          >
-            <Text className="text-primary-500 text-base font-semibold">
-              Register
-            </Text>
-          </TouchableOpacity>
-        </View>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("ForgotPassword")}
+          className="mb-5"
+        >
+          <Text className="text-white text-lg font-semibold">
+            Forgot Password?
+          </Text>
+        </TouchableOpacity>
+        <Text className="text-primary-400">Don't have an account? </Text>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("Signup")}
+          className="ml-1"
+        >
+          <Text className="text-white font-semibold">Sign Up</Text>
+        </TouchableOpacity>
       </View>
-      {/* <StatusBar barStyle="light-content" backgroundColor={"#f26a8d"} /> */}
-    </View>
+      <StatusBar barStyle="light-content" backgroundColor={"#F06A37"} />
+    </ScrollView>
   );
 };
 
