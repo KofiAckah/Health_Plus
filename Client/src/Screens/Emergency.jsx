@@ -25,18 +25,6 @@ const Emergency = () => {
     <View>
       <Text>Emergency</Text>
       <Text>Another line</Text>
-      <TouchableOpacity
-        className="bg-red-500 p-2 rounded-full mt-5 mx-5"
-        onPress={() => navigation.navigate("Login")}
-      >
-        <Text className="text-white text-center">Login</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        className="bg-red-500 p-2 rounded-full mt-5 mx-5"
-        onPress={() => navigation.navigate("Signup")}
-      >
-        <Text className="text-white text-center">Signup</Text>
-      </TouchableOpacity>
       {emergencyData &&
         emergencyData.map((issue) => (
           <View key={issue._id} className="p-4 border-b border-gray-200">

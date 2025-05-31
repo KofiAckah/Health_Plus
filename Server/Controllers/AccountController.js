@@ -267,7 +267,9 @@ export const Login = async (req, res) => {
       sameSite: "strict",
     });
 
-    return res.status(200).json({ msg: "Login successful", token });
+    return res
+      .status(200)
+      .json({ msg: "Login successful", token, email: existingUser.email });
   } catch (error) {
     console.error("Error in Login:", error);
     res.status(500).json({ msg: "Internal Server Error" });
