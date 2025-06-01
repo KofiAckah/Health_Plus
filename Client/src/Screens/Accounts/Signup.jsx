@@ -56,7 +56,6 @@ const Signup = () => {
                 placeholder="Enter your password"
                 secureTextEntry
                 className="flex-1 ml-2"
-                style={{ fontSize: 20 }}
               />
             </View>
           </View>
@@ -70,7 +69,6 @@ const Signup = () => {
                 placeholder="Confirm your password"
                 secureTextEntry
                 className="flex-1 ml-2"
-                style={{ fontSize: 20 }}
               />
             </View>
           </View>

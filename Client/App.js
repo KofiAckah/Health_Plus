@@ -5,7 +5,7 @@ import StackScren from "./src/Navigations/StackScren";
 export default function App() {
   return (
     <SafeAreaView className="flex-1">
-      <StatusBar barStyle="dark-content" backgroundColor={"white"} />
+      <StatusBar barStyle="dark-content" backgroundColor={"#F06A37"} />
       <StackScren />
     </SafeAreaView>
   );

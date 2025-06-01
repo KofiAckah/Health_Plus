@@ -35,7 +35,8 @@ const BottomTab = () => {
             <FontAwesomeIcon
               icon={iconName}
               size={(size = focused ? 28 : 22)}
-              color={(color = focused ? "#f5f5f5" : "#cbeef3")}
+              color={(color = focused ? "#f5f5f5" : "#f5f5f5")}
+              // color={(color = focused ? "#f5f5f5" : "#cbeef3")}
             />
           );
         },
@@ -49,7 +50,7 @@ const BottomTab = () => {
         // tabBarActiveBackgroundColor: "#f26a8d",
         // tabBarInactiveBackgroundColor: "#f49cbb",
         tabBarActiveBackgroundColor: "#4a4a4a",
-        tabBarInactiveBackgroundColor: "#f26a8d",
+        tabBarInactiveBackgroundColor: "#F06A37",
         headerShown: false,
         tabBarStyle: {
           position: "absolute",
