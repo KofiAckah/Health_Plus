@@ -4,7 +4,9 @@ import { deleteImage } from "../utils/cloundinary.js";
 
 export const getAllIssues = async (req, res) => {
   try {
-    const issues = await Issue.find().populate("createdBy", "name email");
+    const issues = await Issue.find()
+      .populate("createdBy", "name email profilePicture")
+      .sort({ createdAt: -1 });
     return res.status(200).json(issues);
   } catch (error) {
     console.error("Error fetching issues:", error);
