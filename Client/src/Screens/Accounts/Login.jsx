@@ -50,7 +50,7 @@ const Login = () => {
 
   return (
     <ScrollView
-      className="flex-1 bg-secondary-600"
+      className="flex-1 bg-secondary-100"
       keyboardShouldPersistTaps="handled"
     >
       <View className="bg-white rounded-b-[70px] pt-16 pb-24">
@@ -62,8 +62,8 @@ const Login = () => {
           <Text className="text-2xl font-bold uppercase mb-4">Login</Text>
           <View className="mt-5">
             <Text className="text-gray-600 text-lg font-semibold">Email</Text>
-            <View className="flex flex-row items-center border-b border-secondary-600 py-2">
-              <FontAwesomeIcon icon={faUser} size={20} color="#F06A37" />
+            <View className="flex flex-row items-center border-b border-secondary-300 py-2">
+              <FontAwesomeIcon icon={faUser} size={20} color="#259FB7" />
               <TextInput
                 placeholder="Enter your email"
                 className="flex-1 ml-2"
@@ -79,8 +79,8 @@ const Login = () => {
             <Text className="text-gray-600 text-lg font-semibold">
               Password
             </Text>
-            <View className="flex flex-row items-center border-b border-secondary-600 py-2">
-              <FontAwesomeIcon icon={faLock} size={20} color="#F06A37" />
+            <View className="flex flex-row items-center border-b border-secondary-300 py-2">
+              <FontAwesomeIcon icon={faLock} size={20} color="#259FB7" />
               <TextInput
                 placeholder="Enter your password"
                 secureTextEntry
@@ -99,7 +99,7 @@ const Login = () => {
           onPress={handleLogin}
           disabled={loading}
         >
-          <Text className="text-secondary-600 text-center text-lg font-semibold">
+          <Text className="text-secondary-100 text-center text-lg font-semibold">
             {loading ? "Logging in..." : "Login"}
           </Text>
         </TouchableOpacity>
@@ -112,7 +112,7 @@ const Login = () => {
             Forgot Password?
           </Text>
         </TouchableOpacity>
-        <Text className="text-primary-400">Don't have an account? </Text>
+        <Text className="text-primary-200">Don't have an account? </Text>
         <TouchableOpacity
           onPress={() => navigation.navigate("Signup")}
           className="ml-1"
@@ -121,7 +121,7 @@ const Login = () => {
           <Text className="text-white font-semibold">Sign Up</Text>
         </TouchableOpacity>
       </View>
-      <StatusBar barStyle="light-content" backgroundColor={"#F06A37"} />
+      <StatusBar barStyle="light-content" backgroundColor={"#0071BD"} />
     </ScrollView>
   );
 };

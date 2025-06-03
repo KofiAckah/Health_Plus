@@ -50,7 +50,7 @@ const BottomTab = () => {
         // tabBarActiveBackgroundColor: "#f26a8d",
         // tabBarInactiveBackgroundColor: "#f49cbb",
         tabBarActiveBackgroundColor: "#4a4a4a",
-        tabBarInactiveBackgroundColor: "#F06A37",
+        tabBarInactiveBackgroundColor: "#0071BD",
         headerShown: false,
         tabBarStyle: {
           position: "absolute",

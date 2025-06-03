@@ -17,7 +17,7 @@ const Signup = () => {
   const navigation = useNavigation();
 
   return (
-    <ScrollView className="flex-1 bg-secondary-600">
+    <ScrollView className="flex-1 bg-secondary-100">
       <View className="bg-white rounded-b-[70px] pt-7 pb-20">
         <View className="flex flex-row w-full justify-center items-center mb-14">
           <Image source={Logo} className="w-20 h-20" />
@@ -27,8 +27,8 @@ const Signup = () => {
           <Text className="text-2xl font-bold uppercase mb-4">Sign Up</Text>
           <View className="mt-2">
             <Text className="text-gray-600 text-lg font-semibold">Name</Text>
-            <View className="flex flex-row items-center border-b border-secondary-600 py-2">
-              <FontAwesomeIcon icon={faUser} size={20} color="#F06A37" />
+            <View className="flex flex-row items-center border-b border-secondary-300 py-2">
+              <FontAwesomeIcon icon={faUser} size={20} color="#259FB7" />
               <TextInput
                 placeholder="Enter your name"
                 className="flex-1 ml-2"
@@ -37,8 +37,8 @@ const Signup = () => {
           </View>
           <View className="mt-5">
             <Text className="text-gray-600 text-lg font-semibold">Email</Text>
-            <View className="flex flex-row items-center border-b border-secondary-600 py-2">
-              <FontAwesomeIcon icon={faEnvelope} size={20} color="#F06A37" />
+            <View className="flex flex-row items-center border-b border-secondary-300 py-2">
+              <FontAwesomeIcon icon={faEnvelope} size={20} color="#259FB7" />
               <TextInput
                 placeholder="Enter your email"
                 keyboardType="email-address"
@@ -50,8 +50,8 @@ const Signup = () => {
             <Text className="text-gray-600 text-lg font-semibold">
               Password
             </Text>
-            <View className="flex flex-row items-center border-b border-secondary-600 py-2">
-              <FontAwesomeIcon icon={faLock} size={20} color="#F06A37" />
+            <View className="flex flex-row items-center border-b border-secondary-300 py-2">
+              <FontAwesomeIcon icon={faLock} size={20} color="#259FB7" />
               <TextInput
                 placeholder="Enter your password"
                 secureTextEntry
@@ -63,8 +63,8 @@ const Signup = () => {
             <Text className="text-gray-600 text-lg font-semibold">
               Confirm Password
             </Text>
-            <View className="flex flex-row items-center border-b border-secondary-600 py-2">
-              <FontAwesomeIcon icon={faLock} size={20} color="#F06A37" />
+            <View className="flex flex-row items-center border-b border-secondary-300 py-2">
+              <FontAwesomeIcon icon={faLock} size={20} color="#259FB7" />
               <TextInput
                 placeholder="Confirm your password"
                 secureTextEntry
@@ -79,11 +79,11 @@ const Signup = () => {
           className="bg-white p-3 rounded-xl mt-14 mb-7 mx-auto w-[80%]"
           onPress={() => navigation.navigate("Home")}
         >
-          <Text className="text-secondary-600 text-center text-lg font-semibold">
+          <Text className="text-secondary-100 text-center text-lg font-semibold">
             Sign Up
           </Text>
         </TouchableOpacity>
-        <Text className="text-primary-400">Already have an account? </Text>
+        <Text className="text-black">Already have an account? </Text>
         <TouchableOpacity
           onPress={() => navigation.navigate("Login")}
           className="ml-1"
@@ -91,7 +91,7 @@ const Signup = () => {
           <Text className="text-white font-semibold">Login</Text>
         </TouchableOpacity>
       </View>
-      <StatusBar barStyle="light-content" backgroundColor={"#F06A37"} />
+      <StatusBar barStyle="light-content" backgroundColor={"#0071BD"} />
     </ScrollView>
   );
 };
