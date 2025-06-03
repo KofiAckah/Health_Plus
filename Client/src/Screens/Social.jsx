@@ -1,8 +1,7 @@
 import {
   View,
   Text,
-  ScrollView,
-  StatusBar,
+  FlatList,
   TouchableOpacity,
   Image,
   RefreshControl,
@@ -11,7 +10,7 @@ import {
   SafeAreaView,
 } from "react-native";
 import axios from "axios";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { BackendLink } from "../Components/Default";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
@@ -31,14 +30,17 @@ import {
 } from "@fortawesome/free-regular-svg-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
+import ImageViewer from "../Components/ImageViewer";
 
 const Social = () => {
   const navigation = useNavigation();
-  const [issues, setIssues] = useState(null);
+  const [issues, setIssues] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [userId, setUserId] = useState(null);
-  const [commentInputs, setCommentInputs] = useState({}); // { [issueId]: commentText }
+  const [commentInputs, setCommentInputs] = useState({});
+  const [viewerVisible, setViewerVisible] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
 
   // Get userId from token (assuming you store userId in AsyncStorage)
   useEffect(() => {
@@ -63,32 +65,27 @@ const Social = () => {
     getUserId();
   }, []);
 
-  const onRefresh = async () => {
-    setRefreshing(true);
+  const fetchIssues = useCallback(async () => {
     try {
       const response = await axios.get(`${BackendLink}/issue/`);
       setIssues(response.data);
     } catch (error) {
       console.error("Error fetching issues data:", error);
     } finally {
+      setLoading(false);
       setRefreshing(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    const fetchIssueData = async () => {
-      try {
-        const response = await axios.get(`${BackendLink}/issue/`);
-        setIssues(response.data);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching issues data:", error);
-        setLoading(false);
-      }
-    };
+    setLoading(true);
+    fetchIssues();
+  }, [fetchIssues]);
 
-    fetchIssueData();
-  }, []);
+  const onRefresh = async () => {
+    setRefreshing(true);
+    fetchIssues();
+  };
 
   const handleReaction = async (issueId, reactionType) => {
     try {
@@ -103,8 +100,7 @@ const Social = () => {
         }
       );
       // Refetch all issues so you get the populated createdBy
-      const response = await axios.get(`${BackendLink}/issue/`);
-      setIssues(response.data);
+      fetchIssues();
     } catch (error) {
       console.error("Error reacting to issue:", error);
     }
@@ -125,8 +121,7 @@ const Social = () => {
         }
       );
       // Refetch all issues to get updated comments
-      const response = await axios.get(`${BackendLink}/issue/`);
-      setIssues(response.data);
+      fetchIssues();
       setCommentInputs((prev) => ({ ...prev, [issueId]: "" }));
       Alert.alert("Success", "Comment added");
     } catch (error) {
@@ -134,238 +129,227 @@ const Social = () => {
     }
   };
 
-  return (
-    <SafeAreaView className="flex-1 bg-white">
-      <ScrollView
-        className=""
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-        showsVerticalScrollIndicator={false}
-      >
-        <View className="mb-20">
-          <View className="flex-row items-center justify-center mt-2 px-2">
-            <Text className="text-2xl font-bold mx-auto">Feed</Text>
+  const renderItem = ({ item: issue }) => {
+    const userReaction = issue.reactedUsers?.find(
+      (ru) => ru.user === userId || ru.user?._id === userId
+    )?.reaction;
+
+    return (
+      <View key={issue._id} className="mb-2 bg-gray-50 pb-2">
+        <TouchableOpacity
+          className="p-4"
+          onPress={() => navigation.navigate("IssueDetails", { issue })}
+          activeOpacity={0.9}
+        >
+          <View>
+            <View className="flex-row mb-2">
+              {issue.createdBy.profilePicture ? (
+                <Image
+                  source={{ uri: issue.createdBy.profilePicture }}
+                  className="w-12 h-12 rounded-full mr-2"
+                />
+              ) : (
+                <View className="w-12 h-12 rounded-full mr-2 border border-primary-100 flex items-center justify-center">
+                  <FontAwesomeIcon icon={faUser} size={26} color="#4a4a4a" />
+                </View>
+              )}
+              <View className="flex flex-col justify-center">
+                <Text className="text-lg font-semibold ">
+                  {issue.createdBy ? issue.createdBy.name : "Unknown User"}
+                </Text>
+                <Text className="text-primary-100 text-sm">
+                  {new Date(issue.createdAt).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </Text>
+              </View>
+            </View>
+          </View>
+          <Text className="text-lg font-semibold">{issue.title}</Text>
+          <Text className="text-primary-300 mt-1 line-clamp-3">
+            {issue.description}
+          </Text>
+        </TouchableOpacity>
+        <View>
+          <Text
+            className="absolute right-1 px-2 py-1 rounded-b-lg z-10 "
+            style={{
+              backgroundColor:
+                issue.status === "Open"
+                  ? "#ef4444"
+                  : issue.status === "In Progress"
+                  ? "#facc15"
+                  : issue.status === "Resolved"
+                  ? "#3b82f6"
+                  : issue.status === "Closed"
+                  ? "#22c55e"
+                  : "#e5e7eb",
+              color: issue.status === "In Progress" ? "#92400e" : "#fff",
+            }}
+          >
+            {issue.status}
+          </Text>
+        </View>
+        <Image
+          source={{ uri: issue.issuePicture }}
+          className="w-full h-64 object-cover"
+          onTouchEnd={() => {
+            setSelectedImage(issue.issuePicture);
+            setViewerVisible(true);
+          }}
+        />
+        {/* Reaction Section */}
+        <View className="flex-row justify-between items-center px-4 pt-2 mx-4">
+          <TouchableOpacity
+            onPress={() => handleReaction(issue._id, "likes")}
+            className="p-2"
+          >
+            <View className="flex-row items-center">
+              <FontAwesomeIcon
+                icon={userReaction === "likes" ? faThumbsUpSolid : faThumbsUp}
+                size={20}
+                color="#49739c"
+              />
+              <Text className="ml-2 text-primary-100">
+                {issue.reactions.likes}
+              </Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => handleReaction(issue._id, "loves")}
+            className="p-2"
+          >
+            <View className="flex-row items-center">
+              <FontAwesomeIcon
+                icon={userReaction === "loves" ? faHeartSolid : faHeart}
+                size={20}
+                color="#49739c"
+              />
+              <Text className="ml-2 text-primary-100">
+                {issue.reactions.loves}
+              </Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => handleReaction(issue._id, "joys")}
+            className="p-2"
+          >
+            <View className="flex-row items-center">
+              <FontAwesomeIcon
+                icon={userReaction === "joys" ? faFaceSmileSolid : faFaceSmile}
+                size={20}
+                color="#49739c"
+              />
+              <Text className="ml-2 text-primary-100">
+                {issue.reactions.joys}
+              </Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => handleReaction(issue._id, "sads")}
+            className="p-2 "
+          >
+            <View className="flex-row items-center">
+              <FontAwesomeIcon
+                icon={
+                  userReaction === "sads"
+                    ? faFaceFrownOpenSolid
+                    : faFaceFrownOpen
+                }
+                size={20}
+                color="#49739c"
+              />
+              <Text className="ml-2 text-primary-100">
+                {issue.reactions.sads}
+              </Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+
+        {/* Comments Section */}
+        <View style={{ paddingHorizontal: 16 }}>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              marginTop: 8,
+            }}
+          >
+            <TextInput
+              placeholder="Add a comment..."
+              value={commentInputs[issue._id] || ""}
+              onChangeText={(text) =>
+                setCommentInputs((prev) => ({
+                  ...prev,
+                  [issue._id]: text,
+                }))
+              }
+              className="flex-1 bg-secondary-200 rounded-lg pl-3 p-2 mr-2 placeholder:text-primary-100"
+            />
             <TouchableOpacity
-              onPress={() => navigation.navigate("PostIssue")}
-              className="ml-4 p-2 bg-primary-100 rounded-lg"
+              onPress={() => handleAddComment(issue._id)}
+              className="bg-primary-100 p-2 px-4 rounded-lg"
+              disabled={
+                !commentInputs[issue._id] || !commentInputs[issue._id].trim()
+              }
             >
-              <FontAwesomeIcon icon={faSquarePlus} size={24} color="#fff" />
+              <FontAwesomeIcon
+                icon={faPaperPlane}
+                size={20}
+                color="#fff"
+                style={{
+                  marginHorizontal: "auto",
+                  marginVertical: "auto",
+                  opacity:
+                    !commentInputs[issue._id] ||
+                    !commentInputs[issue._id].trim()
+                      ? 0.5
+                      : 1,
+                }}
+              />
             </TouchableOpacity>
           </View>
-          {loading ? (
-            <Text>Loading...</Text>
-          ) : (
-            issues &&
-            issues.map((issue) => {
-              // Find the user's reaction for this issue
-              const userReaction = issue.reactedUsers?.find(
-                (ru) => ru.user === userId || ru.user?._id === userId
-              )?.reaction;
-
-              return (
-                <View key={issue._id} className="mb-2">
-                  <View className="p-4">
-                    <View>
-                      <View className="flex-row mb-2">
-                        {issue.createdBy.profilePicture ? (
-                          <Image
-                            source={{ uri: issue.createdBy.profilePicture }}
-                            className="w-12 h-12 rounded-full mr-2"
-                          />
-                        ) : (
-                          <View className="w-12 h-12 rounded-full mr-2 border border-primary-100 flex items-center justify-center">
-                            <FontAwesomeIcon
-                              icon={faUser}
-                              size={26}
-                              color="#4a4a4a"
-                            />
-                          </View>
-                        )}
-                        <View className="flex flex-col justify-center">
-                          <Text className="text-lg font-semibold">
-                            {issue.createdBy
-                              ? issue.createdBy.name
-                              : "Unknown User"}
-                          </Text>
-                          <Text className="text-primary-100 text-sm">
-                            {new Date(issue.createdAt).toLocaleDateString(
-                              "en-US",
-                              {
-                                year: "numeric",
-                                month: "long",
-                                day: "numeric",
-                              }
-                            )}
-                          </Text>
-                        </View>
-                      </View>
-                    </View>
-                    <Text className="text-lg font-semibold">{issue.title}</Text>
-                    <Text className="text-primary-300 mt-1">
-                      {issue.description}
-                    </Text>
-                  </View>
-                  <View>
-                    <Text
-                      className="absolute right-1 px-2 py-1 rounded-b-lg z-10 "
-                      style={{
-                        backgroundColor:
-                          issue.status === "Open"
-                            ? "#ef4444" // red-500
-                            : issue.status === "In Progress"
-                            ? "#facc15" // yellow-400
-                            : issue.status === "Resolved"
-                            ? "#3b82f6" // blue-500
-                            : issue.status === "Closed"
-                            ? "#22c55e" // green-500
-                            : "#e5e7eb", // gray-200 fallback
-                        color:
-                          issue.status === "In Progress"
-                            ? "#92400e" // dark text for yellow
-                            : "#fff", // white text for red/green
-                      }}
-                    >
-                      {issue.status}
-                    </Text>
-                  </View>
-                  <Image
-                    source={{ uri: issue.issuePicture }}
-                    className="w-full h-64 object-cover"
-                  />
-                  {/* Reaction Section */}
-                  <View className="flex-row justify-between items-center px-4 pt-2 mx-4">
-                    <TouchableOpacity
-                      onPress={() => handleReaction(issue._id, "likes")}
-                      className="p-2"
-                    >
-                      <View className="flex-row items-center">
-                        <FontAwesomeIcon
-                          icon={
-                            userReaction === "likes"
-                              ? faThumbsUpSolid
-                              : faThumbsUp
-                          }
-                          size={20}
-                          color="#49739c"
-                        />
-                        <Text className="ml-2 text-primary-100">
-                          {issue.reactions.likes}
-                        </Text>
-                      </View>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      onPress={() => handleReaction(issue._id, "loves")}
-                      className="p-2"
-                    >
-                      <View className="flex-row items-center">
-                        <FontAwesomeIcon
-                          icon={
-                            userReaction === "loves" ? faHeartSolid : faHeart
-                          }
-                          size={20}
-                          color="#49739c"
-                        />
-                        <Text className="ml-2 text-primary-100">
-                          {issue.reactions.loves}
-                        </Text>
-                      </View>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      onPress={() => handleReaction(issue._id, "joys")}
-                      className="p-2"
-                    >
-                      <View className="flex-row items-center">
-                        <FontAwesomeIcon
-                          icon={
-                            userReaction === "joys"
-                              ? faFaceSmileSolid
-                              : faFaceSmile
-                          }
-                          size={20}
-                          color="#49739c"
-                        />
-                        <Text className="ml-2 text-primary-100">
-                          {issue.reactions.joys}
-                        </Text>
-                      </View>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      onPress={() => handleReaction(issue._id, "sads")}
-                      className="p-2 "
-                    >
-                      <View className="flex-row items-center">
-                        <FontAwesomeIcon
-                          icon={
-                            userReaction === "sads"
-                              ? faFaceFrownOpenSolid
-                              : faFaceFrownOpen
-                          }
-                          size={20}
-                          color="#49739c"
-                        />
-                        <Text className="ml-2 text-primary-100">
-                          {issue.reactions.sads}
-                        </Text>
-                      </View>
-                    </TouchableOpacity>
-                  </View>
-
-                  {/* Comments Section */}
-                  <View style={{ paddingHorizontal: 16 }}>
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        marginTop: 8,
-                      }}
-                    >
-                      <TextInput
-                        placeholder="Add a comment..."
-                        value={commentInputs[issue._id] || ""}
-                        onChangeText={(text) =>
-                          setCommentInputs((prev) => ({
-                            ...prev,
-                            [issue._id]: text,
-                          }))
-                        }
-                        className="flex-1 bg-secondary-200 rounded-lg pl-3 p-2 mr-2 placeholder:text-primary-100"
-                      />
-                      <TouchableOpacity
-                        onPress={() => handleAddComment(issue._id)}
-                        className="bg-primary-100 p-2 px-4 rounded-lg"
-                        disabled={
-                          !commentInputs[issue._id] ||
-                          !commentInputs[issue._id].trim()
-                        }
-                      >
-                        <FontAwesomeIcon
-                          icon={faPaperPlane}
-                          size={20}
-                          color="#fff"
-                          style={{
-                            marginHorizontal: "auto",
-                            marginVertical: "auto",
-                            opacity:
-                              !commentInputs[issue._id] ||
-                              !commentInputs[issue._id].trim()
-                                ? 0.5
-                                : 1,
-                          }}
-                        />
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                </View>
-              );
-            })
-          )}
         </View>
-      </ScrollView>
-      <StatusBar
-        barStyle="light-content"
-        backgroundColor="#0071BD"
-        translucent={false}
+      </View>
+    );
+  };
+
+  return (
+    <SafeAreaView className="flex-1 bg-white">
+      <View className="mb-20">
+        <View className="flex-row items-center justify-center mt-2 mb-2 px-2">
+          <Text className="text-2xl font-bold mx-auto">Feed</Text>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("PostIssue")}
+            className="ml-4 p-2 bg-primary-100 rounded-lg"
+          >
+            <FontAwesomeIcon icon={faSquarePlus} size={24} color="#fff" />
+          </TouchableOpacity>
+        </View>
+        <FlatList
+          data={issues}
+          keyExtractor={(item) => item._id}
+          renderItem={renderItem}
+          ListEmptyComponent={
+            loading ? (
+              <Text className="text-center mt-8">Loading...</Text>
+            ) : (
+              <Text className="text-center mt-8">No issues found.</Text>
+            )
+          }
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 100 }}
+        />
+      </View>
+      <ImageViewer
+        visible={viewerVisible}
+        imageUrl={selectedImage}
+        onClose={() => setViewerVisible(false)}
       />
     </SafeAreaView>
   );

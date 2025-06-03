@@ -123,7 +123,7 @@ const PostIssue = () => {
               editable={!uploading}
             />
             <TextInput
-              className="w-[90%] mx-auto bg-secondary-200 p-3 rounded-lg mb-4 h-40 placeholder:text-primary-100"
+              className="w-[90%] mx-auto bg-secondary-200 p-3 rounded-lg mb-4 h-28 placeholder:text-primary-100"
               placeholder="Description"
               placeholderTextColor="#b0b8c1"
               multiline

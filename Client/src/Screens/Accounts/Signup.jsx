@@ -6,7 +6,6 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
-  StatusBar,
 } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faUser, faEnvelope, faLock } from "@fortawesome/free-solid-svg-icons";
@@ -91,7 +90,6 @@ const Signup = () => {
           <Text className="text-white font-semibold">Login</Text>
         </TouchableOpacity>
       </View>
-      <StatusBar barStyle="light-content" backgroundColor={"#0071BD"} />
     </ScrollView>
   );
 };

@@ -13,6 +13,7 @@ import Login from "../Screens/Accounts/Login";
 import ForgetPassword from "../Screens/Accounts/ForgetPassword";
 // Socials Screens
 import PostIssue from "../Screens/Socials/PostIssue";
+import IssueDetails from "../Screens/Socials/IssueDetails";
 
 const Stack = createStackNavigator();
 
@@ -34,7 +35,7 @@ const StackScren = () => {
   if (!initialRoute) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator size="large" color="#F06A37" />
+        <ActivityIndicator size="large" color="#11D6CD" />
       </View>
     );
   }
@@ -55,6 +56,7 @@ const StackScren = () => {
         {/* Socials Screen */}
         <>
           <Stack.Screen name="PostIssue" component={PostIssue} />
+          <Stack.Screen name="IssueDetails" component={IssueDetails} />
         </>
         {/* Help Screen */}
         <Stack.Screen name="Help" component={Help} />

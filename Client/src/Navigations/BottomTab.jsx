@@ -47,8 +47,6 @@ const BottomTab = () => {
           fontFamily: "San-Serif",
           textAlign: "center",
         },
-        // tabBarActiveBackgroundColor: "#f26a8d",
-        // tabBarInactiveBackgroundColor: "#f49cbb",
         tabBarActiveBackgroundColor: "#4a4a4a",
         tabBarInactiveBackgroundColor: "#0071BD",
         headerShown: false,

@@ -5,7 +5,6 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
-  StatusBar,
   Alert,
 } from "react-native";
 import axios from "axios";
@@ -121,7 +120,6 @@ const Login = () => {
           <Text className="text-white font-semibold">Sign Up</Text>
         </TouchableOpacity>
       </View>
-      <StatusBar barStyle="light-content" backgroundColor={"#0071BD"} />
     </ScrollView>
   );
 };

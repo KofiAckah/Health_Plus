@@ -1,12 +1,20 @@
 import "./global.css";
-import { SafeAreaView, StatusBar } from "react-native";
+import { SafeAreaView, StyleSheet, Platform, StatusBar } from "react-native";
 import StackScren from "./src/Navigations/StackScren";
 
 export default function App() {
   return (
-    <SafeAreaView className="flex-1">
-      <StatusBar barStyle="dark-content" backgroundColor={"#0071BD"} />
+    <SafeAreaView style={styles.container}>
       <StackScren />
+      {/* <StatusBar style="auto" /> */}
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#0071BD",
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+  },
+});
