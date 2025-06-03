@@ -30,8 +30,10 @@ import {
   faPaperPlane,
 } from "@fortawesome/free-regular-svg-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from "@react-navigation/native";
 
 const Social = () => {
+  const navigation = useNavigation();
   const [issues, setIssues] = useState(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -145,9 +147,7 @@ const Social = () => {
           <View className="flex-row items-center justify-center mt-2 px-2">
             <Text className="text-2xl font-bold mx-auto">Feed</Text>
             <TouchableOpacity
-              onPress={() =>
-                Alert.alert("Create Issue", "Feature coming soon!")
-              }
+              onPress={() => navigation.navigate("PostIssue")}
               className="ml-4 p-2 bg-primary-100 rounded-lg"
             >
               <FontAwesomeIcon icon={faSquarePlus} size={24} color="#fff" />

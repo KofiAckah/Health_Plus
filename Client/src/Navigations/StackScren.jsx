@@ -7,9 +7,12 @@ import { ActivityIndicator, View } from "react-native";
 // Screens
 import BottomTab from "./BottomTab";
 import Help from "../Screens/Help";
-import ForgetPassword from "../Screens/Accounts/ForgetPassword";
+// Accounts Screens
 import Signup from "../Screens/Accounts/Signup";
 import Login from "../Screens/Accounts/Login";
+import ForgetPassword from "../Screens/Accounts/ForgetPassword";
+// Socials Screens
+import PostIssue from "../Screens/Socials/PostIssue";
 
 const Stack = createStackNavigator();
 
@@ -43,9 +46,17 @@ const StackScren = () => {
         initialRouteName={initialRoute}
       >
         <Stack.Screen name="BottomTab" component={BottomTab} />
-        <Stack.Screen name="Login" component={Login} />
-        <Stack.Screen name="Signup" component={Signup} />
-        <Stack.Screen name="ForgetPassword" component={ForgetPassword} />
+        {/* Accounts Screen */}
+        <>
+          <Stack.Screen name="Login" component={Login} />
+          <Stack.Screen name="Signup" component={Signup} />
+          <Stack.Screen name="ForgetPassword" component={ForgetPassword} />
+        </>
+        {/* Socials Screen */}
+        <>
+          <Stack.Screen name="PostIssue" component={PostIssue} />
+        </>
+        {/* Help Screen */}
         <Stack.Screen name="Help" component={Help} />
       </Stack.Navigator>
     </NavigationContainer>
