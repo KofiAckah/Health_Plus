@@ -10,32 +10,37 @@ const commentSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    createdAt: {
-      type: Date,
-      default: Date.now,
-    },
   },
   { timestamps: true }
 );
 
-const reactionSchema = new mongoose.Schema(
-  {
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-    },
-    type: {
-      type: String,
-      enum: ["Like", "Dislike"],
-      required: true,
-    },
-    createdAt: {
-      type: Date,
-      default: Date.now,
-    },
+const reactionSchema = new mongoose.Schema({
+  likes: {
+    type: Number,
+    default: 0,
   },
-  { timestamps: true }
-);
+  loves: {
+    type: Number,
+    default: 0,
+  },
+  joys: {
+    type: Number,
+    default: 0,
+  },
+  sads: {
+    type: Number,
+    default: 0,
+  },
+});
+
+const reactedUserSchema = new mongoose.Schema({
+  user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  reaction: {
+    type: String,
+    enum: ["likes", "loves", "joys", "sads"],
+    required: true,
+  },
+});
 
 const issueSchema = new mongoose.Schema(
   {
@@ -48,7 +53,9 @@ const issueSchema = new mongoose.Schema(
       required: true,
     },
     comments: [commentSchema],
-    reactions: [reactionSchema],
+    // reactions: [reactionSchema],
+    reactions: reactionSchema,
+    reactedUsers: [reactedUserSchema],
     issuePicture: {
       type: String,
       required: true,

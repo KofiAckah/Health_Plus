@@ -37,6 +37,10 @@ export const createIssue = async (req, res) => {
       createdBy: userId,
       issuePicture: issuePicture.secure_url,
       issuePictureId: issuePicture.public_id,
+      reactions: { likes: 0, loves: 0, joys: 0, sads: 0 },
+      reactedUsers: [], // <-- initialize as empty array
+      comments: [],     // <-- initialize as empty array
+      // status will default to "Open"
     });
 
     await newIssue.save();
@@ -57,6 +61,88 @@ export const getOneIssue = async (req, res) => {
     return res.status(200).json(issue);
   } catch (error) {
     console.error("Error fetching issue:", error);
+    res.status(500).json({ msg: error.message });
+  }
+};
+
+// Add or update a user's reaction to an issue
+export const reactToIssue = async (req, res) => {
+  try {
+    const { id } = req.params; // issue id
+    const { reaction } = req.body; // "likes", "loves", "joys", "sads"
+    const userId = req.user.id;
+
+    if (!["likes", "loves", "joys", "sads"].includes(reaction)) {
+      return res.status(400).json({ msg: "Invalid reaction type." });
+    }
+
+    const issue = await Issue.findById(id);
+    if (!issue) return res.status(404).json({ msg: "Issue not found." });
+
+    // Ensure reactions object exists
+    if (!issue.reactions) {
+      issue.reactions = { likes: 0, loves: 0, joys: 0, sads: 0 };
+    }
+
+    // Check if user already reacted with the same reaction
+    const existingReaction = issue.reactedUsers.find(
+      (ru) => ru.user.toString() === userId && ru.reaction === reaction
+    );
+
+    if (existingReaction) {
+      // User clicked the same reaction again, so remove their reaction
+      issue.reactedUsers = issue.reactedUsers.filter(
+        (ru) => ru.user.toString() !== userId
+      );
+    } else {
+      // Remove any previous reaction by this user
+      issue.reactedUsers = issue.reactedUsers.filter(
+        (ru) => ru.user.toString() !== userId
+      );
+      // Add new reaction
+      issue.reactedUsers.push({ user: userId, reaction });
+    }
+
+    // Reset all counts
+    issue.reactions.likes = issue.reactedUsers.filter(
+      (r) => r.reaction === "likes"
+    ).length;
+    issue.reactions.loves = issue.reactedUsers.filter(
+      (r) => r.reaction === "loves"
+    ).length;
+    issue.reactions.joys = issue.reactedUsers.filter(
+      (r) => r.reaction === "joys"
+    ).length;
+    issue.reactions.sads = issue.reactedUsers.filter(
+      (r) => r.reaction === "sads"
+    ).length;
+
+    await issue.save();
+    const populatedIssue = await Issue.findById(issue._id).populate("createdBy", "name email profilePicture");
+    return res.status(200).json(populatedIssue);
+  } catch (error) {
+    console.error("Error reacting to issue:", error);
+    res.status(500).json({ msg: error.message });
+  }
+};
+
+export const addComment = async (req, res) => {
+  try {
+    const { id } = req.params; // issue id
+    const { text } = req.body;
+    const userId = req.user.id;
+
+    if (!text) return res.status(400).json({ msg: "Comment text required." });
+
+    const issue = await Issue.findById(id);
+    if (!issue) return res.status(404).json({ msg: "Issue not found." });
+
+    issue.comments.push({ user: userId, text });
+    await issue.save();
+
+    return res.status(200).json(issue.comments);
+  } catch (error) {
+    console.error("Error adding comment:", error);
     res.status(500).json({ msg: error.message });
   }
 };
