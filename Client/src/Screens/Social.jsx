@@ -81,7 +81,9 @@ const Social = () => {
       <View key={issue._id} className="mb-2 bg-gray-50 pb-2">
         <TouchableOpacity
           className="p-4"
-          onPress={() => navigation.navigate("IssueDetails", { issue })}
+          onPress={() =>
+            navigation.navigate("IssueDetails", { issueId: issue._id })
+          }
           activeOpacity={0.9}
         >
           <View>

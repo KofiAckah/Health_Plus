@@ -39,7 +39,7 @@ export const createIssue = async (req, res) => {
       issuePictureId: issuePicture.public_id,
       reactions: { likes: 0, loves: 0, joys: 0, sads: 0 },
       reactedUsers: [], // <-- initialize as empty array
-      comments: [],     // <-- initialize as empty array
+      comments: [], // <-- initialize as empty array
       // status will default to "Open"
     });
 
@@ -54,7 +54,9 @@ export const createIssue = async (req, res) => {
 export const getOneIssue = async (req, res) => {
   try {
     const { id } = req.params;
-    const issue = await Issue.findById(id).populate("createdBy", "name email");
+    const issue = await Issue.findById(id)
+      .populate("createdBy", "name email profilePicture")
+      .populate("comments.user", "name profilePicture");
     if (!issue) {
       return res.status(404).json({ msg: "Issue not found." });
     }
@@ -118,7 +120,10 @@ export const reactToIssue = async (req, res) => {
     ).length;
 
     await issue.save();
-    const populatedIssue = await Issue.findById(issue._id).populate("createdBy", "name email profilePicture");
+    const populatedIssue = await Issue.findById(issue._id).populate(
+      "createdBy",
+      "name email profilePicture"
+    );
     return res.status(200).json(populatedIssue);
   } catch (error) {
     console.error("Error reacting to issue:", error);
@@ -140,7 +145,12 @@ export const addComment = async (req, res) => {
     issue.comments.push({ user: userId, text });
     await issue.save();
 
-    return res.status(200).json(issue.comments);
+    // Populate user in comments before returning
+    const updatedIssue = await Issue.findById(id)
+      .populate("createdBy", "name email profilePicture")
+      .populate("comments.user", "name profilePicture");
+
+    return res.status(200).json(updatedIssue.comments);
   } catch (error) {
     console.error("Error adding comment:", error);
     res.status(500).json({ msg: error.message });
