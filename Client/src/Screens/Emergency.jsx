@@ -23,15 +23,15 @@ const Emergency = () => {
 
   return (
     <View>
-      <Text>Emergency</Text>
-      <Text>Another line</Text>
+      <Text>Emergency Screen</Text>
+      {/* <Text>Another line</Text>
       {emergencyData &&
         emergencyData.map((issue) => (
           <View key={issue._id} className="p-4 border-b border-gray-200">
             <Text className="text-lg font-bold">{issue.title}</Text>
             <Text className="text-gray-600">{issue.description}</Text>
           </View>
-        ))}
+        ))} */}
     </View>
   );
 };

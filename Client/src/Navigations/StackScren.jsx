@@ -14,6 +14,8 @@ import ForgetPassword from "../Screens/Accounts/ForgetPassword";
 // Socials Screens
 import PostIssue from "../Screens/Socials/PostIssue";
 import IssueDetails from "../Screens/Socials/IssueDetails";
+// Settings Screens
+import Settings from "../Screens/Settings/Settings";
 
 const Stack = createStackNavigator();
 
@@ -57,6 +59,10 @@ const StackScren = () => {
         <>
           <Stack.Screen name="PostIssue" component={PostIssue} />
           <Stack.Screen name="IssueDetails" component={IssueDetails} />
+        </>
+        {/* Settings Screen */}
+        <>
+          <Stack.Screen name="Settings" component={Settings} />
         </>
         {/* Help Screen */}
         <Stack.Screen name="Help" component={Help} />

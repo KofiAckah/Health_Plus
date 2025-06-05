@@ -29,25 +29,6 @@ const Profile = () => {
     fetchUserData();
   }, []);
 
-  const handleLogout = async () => {
-    try {
-      const token = await AsyncStorage.getItem("token");
-      await axios.get(`${BackendLink}/account/logout`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        withCredentials: true,
-      });
-    } catch (error) {
-      console.error("Error logging out from backend:", error);
-    }
-    await AsyncStorage.removeItem("token");
-    navigation.reset({
-      index: 0,
-      routes: [{ name: "Login" }],
-    });
-  };
-
   return (
     <ScrollView className="flex-1 bg-white">
       {userData ? (
@@ -55,7 +36,9 @@ const Profile = () => {
           <View className="flex justify-between items-center bg-secondary-100 relative h-36 mb-20">
             <View className="flex-row items-center justify-between p-5 w-full">
               <Text className="text-xl font-semibold text-white">Profile</Text>
-              <FontAwesomeIcon icon={faGear} size={24} color="#f5f5f5" />
+              <TouchableOpacity onPress={() => navigation.navigate("Settings")}>
+                <FontAwesomeIcon icon={faGear} size={24} color="#f5f5f5" />
+              </TouchableOpacity>
             </View>
             <View className="absolute top-20 rounded-full border-2 border-white overflow-hidden mx-auto w-32 h-32 bg-secondary-100">
               {userData.profilePicture ? (
@@ -87,17 +70,6 @@ const Profile = () => {
               </Text>
             </View>
           </View>
-          <TouchableOpacity
-            onPress={handleLogout}
-            style={{
-              marginTop: 20,
-              backgroundColor: "#0071BD",
-              padding: 10,
-              borderRadius: 8,
-            }}
-          >
-            <Text style={{ color: "white", textAlign: "center" }}>Logout</Text>
-          </TouchableOpacity>
         </View>
       ) : (
         <Text>Loading...</Text>
@@ -107,17 +79,3 @@ const Profile = () => {
 };
 
 export default Profile;
-
-{
-  /* <TouchableOpacity
-            onPress={handleLogout}
-            style={{
-              marginTop: 20,
-              backgroundColor: "#F06A37",
-              padding: 10,
-              borderRadius: 8,
-            }}
-          >
-            <Text style={{ color: "white", textAlign: "center" }}>Logout</Text>
-          </TouchableOpacity> */
-}

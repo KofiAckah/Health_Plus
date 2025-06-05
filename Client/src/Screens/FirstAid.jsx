@@ -6,7 +6,7 @@ import { firstAidTips } from "../Components/FirstAidTips";
 const FirstAid = () => {
   return (
     <ScrollView className="flex-1 bg-background">
-      <View className="p-4">
+      <View className="p-4 mb-16">
         <Text className="text-2xl font-bold mb-4">First Aid Tips</Text>
 
         {firstAidTips.map((category) => (
