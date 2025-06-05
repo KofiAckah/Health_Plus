@@ -22,6 +22,7 @@ app.use(
       "http://10.132.215.220:8081", // Metro bundler (web)
       "http://10.132.215.220:19006", // Expo web (if used)
       "exp://10.132.215.220:8081", // Expo Go app
+      "http://localhost:5173", // React app
     ],
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true,
