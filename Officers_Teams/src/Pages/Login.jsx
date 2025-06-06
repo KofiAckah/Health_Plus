@@ -1,7 +1,7 @@
 import { useState } from "react";
 import useAuth from "../context/useAuth";
 import { useNavigate } from "react-router-dom";
-import { Logo } from "../Components/Default";
+import { Logo, CompanyName } from "../Components/Default";
 
 function Login() {
   const { login, loading } = useAuth();
@@ -22,114 +22,44 @@ function Login() {
   };
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "#181314",
-        color: "#fff",
-        fontFamily: "Inter, sans-serif",
-      }}
-    >
-      <header
-        style={{
-          display: "flex",
-          alignItems: "center",
-          padding: "1.5rem 2rem 1rem 2rem",
-          borderBottom: "1px solid #231f20",
-        }}
-      >
-        <img
-          src={Logo}
-          alt="CityServe"
-          // style={{ width: 24, height: 24, marginRight: 12 }}
-        />
-        <span style={{ fontWeight: 700, fontSize: 20, letterSpacing: 0.5 }}>
-          CityServe
-        </span>
+    <div className="min-h-screen bg-[#181314] text-white font-inter">
+      <header className="flex items-center px-8 py-6 border-b border-[#231f20]">
+        <img src={Logo} alt="CityServe" className="w-6 h-6 mr-3" />
+        <span className="font-bold text-xl tracking-wide">{CompanyName}</span>
       </header>
-      <main
-        style={{
-          maxWidth: 480,
-          margin: "0 auto",
-          marginTop: "4rem",
-          padding: "2rem",
-        }}
-      >
-        <h1 style={{ fontSize: 40, fontWeight: 700, marginBottom: 8 }}>
-          Welcome to CityServe
-        </h1>
-        <p style={{ color: "#bdbdbd", marginBottom: 32 }}>
+      <main className="max-w-xl mx-auto mt-16 p-8">
+        <h1 className="text-4xl font-bold mb-2">Welcome to {CompanyName}</h1>
+        <p className="text-[#bdbdbd] mb-8">
           Log in with your Service Order Number (SONumber) and password.
         </p>
-        <form
-          onSubmit={handleSubmit}
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 18,
-            background: "none",
-          }}
-        >
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5 bg-none">
           <input
             type="number"
             placeholder="Service Order Number"
             value={soNumber}
             onChange={(e) => setSoNumber(e.target.value)}
             required
-            style={{
-              background: "#231f20",
-              border: "none",
-              borderRadius: 8,
-              padding: "1rem",
-              color: "#fff",
-              fontSize: 18,
-              marginBottom: 0,
-              outline: "none",
-            }}
+            className="bg-[#231f20] border-none rounded-lg p-4 text-white text-lg outline-none"
           />
-          <div style={{ display: "flex", gap: 12 }}>
-            <input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              style={{
-                flex: 1,
-                background: "#231f20",
-                border: "none",
-                borderRadius: 8,
-                padding: "1rem",
-                color: "#fff",
-                fontSize: 18,
-                outline: "none",
-              }}
-            />
-          </div>
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            className="bg-[#231f20] border-none rounded-lg p-4 text-white text-lg outline-none"
+          />
           <button
             type="submit"
             disabled={loading}
-            style={{
-              marginTop: 16,
-              background: "#f51d1d",
-              color: "#fff",
-              border: "none",
-              borderRadius: 12,
-              padding: "1rem 0",
-              fontSize: 18,
-              fontWeight: 600,
-              cursor: loading ? "not-allowed" : "pointer",
-              transition: "background 0.2s",
-            }}
+            className={`mt-4 bg-[#f51d1d] text-white border-none rounded-xl py-4 text-lg font-semibold transition-colors ${
+              loading ? "opacity-60 cursor-not-allowed" : "hover:bg-red-700"
+            }`}
           >
             {loading ? "Logging in..." : "Log in"}
           </button>
           {error && (
-            <div
-              style={{ color: "#f51d1d", marginTop: 8, textAlign: "center" }}
-            >
-              {error}
-            </div>
+            <div className="text-[#f51d1d] mt-2 text-center">{error}</div>
           )}
         </form>
       </main>
