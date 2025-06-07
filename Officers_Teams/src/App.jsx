@@ -1,20 +1,33 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import "./App.css";
-import useAuth from "./context/useAuth";
-
+import useAuth from "./Context/useAuth";
 import Home from "./Pages/Home";
-import Login from "./Pages/Login";
 import About from "./Pages/About";
+import OfficerLogin from "./Pages/Accounts/OfficerLogin";
+import FireHealthLogin from "./Pages/Accounts/FireHealthLogin";
+import Loader from "./Components/Loader";
+
+function PrivateRoute({ children }) {
+  const { isAuthenticated, loading } = useAuth();
+  if (loading) return <Loader />;
+  return isAuthenticated ? children : <Navigate to="/firehealth-login" />;
+}
 
 function App() {
-  const { isAuthenticated } = useAuth();
   return (
     <div className="App">
       <Routes>
-        {/* <Route path="/" element={<Home />} /> */}
-        <Route path="/" element={isAuthenticated ? <Home /> : <Login />} />
-        <Route path="/login" element={<Login />} />
+        <Route
+          path="/"
+          element={
+            <PrivateRoute>
+              <Home />
+            </PrivateRoute>
+          }
+        />
         <Route path="/about" element={<About />} />
+        <Route path="/officer-login" element={<OfficerLogin />} />
+        <Route path="/firehealth-login" element={<FireHealthLogin />} />
       </Routes>
     </div>
   );

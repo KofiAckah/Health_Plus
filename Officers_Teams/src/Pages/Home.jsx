@@ -1,18 +1,19 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
+import useAuth from "../Context/useAuth";
+import Loader from "../Components/Loader";
 
 function Home() {
   const [teams, setTeams] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchTeams = async () => {
       try {
         setLoading(true);
-        const response = await axios.get("http://localhost:5000/issue", {
-          withCredentials: true,
-        });
+        const response = await axios.get("/issue");
         setTeams(response.data);
       } catch (err) {
         setError(err.message || "Failed to fetch teams");
@@ -20,24 +21,30 @@ function Home() {
         setLoading(false);
       }
     };
-
     fetchTeams();
   }, []);
+
+  if (loading) return <Loader />;
+
   return (
     <div className="home">
       <h1>Teams</h1>
-      {loading && <p>Loading...</p>}
       {error && <p className="error">{error}</p>}
-      {!loading && !error && (
+      {!error && (
         <ul>
           {teams.map((team) => (
             <li key={team._id}>
-              <h2>{team.name}</h2>
+              <h2>{team.name || team.title}</h2>
               <p>{team.description}</p>
             </li>
           ))}
         </ul>
       )}
+      <div className="mt-8">
+        <p>
+          Logged in as: <b>{user?.name}</b> ({user?.role})
+        </p>
+      </div>
     </div>
   );
 }
