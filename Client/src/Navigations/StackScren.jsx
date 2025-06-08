@@ -26,6 +26,7 @@ const StackScren = () => {
     const checkLogin = async () => {
       try {
         const token = await AsyncStorage.getItem("token");
+        // console.log("Token:", token);
         setInitialRoute(token ? "BottomTab" : "Login");
       } catch (e) {
         setInitialRoute("Login");
