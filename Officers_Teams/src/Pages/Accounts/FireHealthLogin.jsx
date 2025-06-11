@@ -1,7 +1,9 @@
 import useAuth from "../../Context/useAuth";
 import { useNavigate } from "react-router-dom";
-import { Logo, CompanyName } from "../../Components/Default";
 import { useState, useEffect } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
+import { Link } from "react-router-dom";
 
 function FireHealthLogin() {
   const {
@@ -41,11 +43,7 @@ function FireHealthLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-white text-primary-300 font-inter">
-      <header className="flex items-center px-6 py-4 border-b border-secondary-200">
-        <img src={Logo} alt="Health Plus Logo" className="w-8 sm:w-12 mr-2" />
-        <span className="text-xl sm:text-2xl font-semibold">{CompanyName}</span>
-      </header>
+    <div className=" bg-white text-primary-300 font-inter">
       <main className="flex flex-col items-center mt-12">
         <div className="w-full max-w-md bg-transparent rounded-lg p-6">
           <h1 className="text-3xl font-bold mb-2 text-primary-300 text-center">
@@ -141,10 +139,42 @@ function FireHealthLogin() {
             >
               {loading ? "Logging in..." : "Log in"}
             </button>
+            <div className="text-xs text-primary-100 text-center mt-2">
+              <p>
+                <FontAwesomeIcon
+                  icon={faInfoCircle}
+                  className="mr-1"
+                  color="#ff4d4d"
+                />
+                This site is for only Ghana National Fire Service and Ghana
+                Health Service personnel only.
+              </p>
+              {/* <p>
+                <FontAwesomeIcon
+                  icon={faInfoCircle}
+                  className="mr-1"
+                  color="#ff4d4d"
+                />
+                For assistance, please reach out to your department's IT
+                support.
+              </p> */}
+            </div>
             {error && (
               <div className="text-red-500 text-center mt-2">{error}</div>
             )}
           </form>
+          {/* Link to Officer */}
+          <div className="text-center mt-4">
+            <p className="text-sm text-primary-100">
+              Not a Fire or Health Service personnel?{" "}
+              <Link
+                to="/officer-login"
+                className="text-primary-200 hover:text-blue-500 transition-colors"
+              >
+                Log in as Police Officer
+              </Link>
+            </p>
+          </div>
         </div>
       </main>
     </div>

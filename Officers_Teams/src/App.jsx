@@ -6,6 +6,7 @@ import About from "./Pages/About";
 import OfficerLogin from "./Pages/Accounts/OfficerLogin";
 import FireHealthLogin from "./Pages/Accounts/FireHealthLogin";
 import Loader from "./Components/Loader";
+import NavBar from "./Components/NavBar";
 
 function PrivateRoute({ children }) {
   const { isAuthenticated, loading } = useAuth();
@@ -16,6 +17,7 @@ function PrivateRoute({ children }) {
 function App() {
   return (
     <div className="App">
+      <NavBar />
       <Routes>
         <Route
           path="/"
