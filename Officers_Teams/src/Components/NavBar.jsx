@@ -25,7 +25,7 @@ function NavBar() {
   };
 
   return (
-    <div className="sticky top-0 shadow-2xl block z-10 bg-white">
+    <div className="sticky top-0 shadow-lg block z-10 bg-white">
       <nav className="flex py-2 max-md:py-3 px-5 justify-between items-center">
         <Link to="/">
           <div className="flex items-center">

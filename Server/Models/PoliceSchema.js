@@ -24,6 +24,10 @@ const policeSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    role: {
+      type: String,
+      default: "police",
+    },
     // badgeNumber: {
     //   type: String,
     //   required: true,

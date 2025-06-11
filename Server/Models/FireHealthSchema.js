@@ -23,6 +23,11 @@ const fireHealthSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    role: {
+      type: String,
+      enum: ["health", "fire"],
+      default: "health",
+    },
   },
   { timestamps: true }
 );
