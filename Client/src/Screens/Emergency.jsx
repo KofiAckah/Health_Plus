@@ -1,37 +1,14 @@
-import {
-  Text,
-  View,
-  TouchableOpacity,
-  ScrollView,
-  Image,
-  StyleSheet,
-} from "react-native";
+import { Text, View, TouchableOpacity, ScrollView, Image } from "react-native";
 import axios from "axios";
 import { useState, useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { BackendLink, Logo, CompanyName } from "../Components/Default";
 import { LinearGradient } from "expo-linear-gradient";
 import { HotlinesData } from "../Components/HotLines";
-import MapView, { Marker } from "react-native-maps";
-import * as Location from "expo-location";
+import ShowMap from "../Components/ShowMap";
 
 const Emergency = () => {
   const navigation = useNavigation();
-  const [location, setLocation] = useState(null);
-  const [errorMsg, setErrorMsg] = useState(null);
-
-  useEffect(() => {
-    (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        setErrorMsg("Permission to access location was denied");
-        return;
-      }
-
-      let location = await Location.getCurrentPositionAsync({});
-      setLocation(location);
-    })();
-  }, []);
 
   return (
     <ScrollView className="flex-1 bg-white">
@@ -44,6 +21,7 @@ const Emergency = () => {
         {HotlinesData.map((item, index) => (
           <TouchableOpacity
             key={index}
+            // onPress={() => Linking.openURL(`tel:${item.cell}`)}
             onPress={item.onPress}
             className="w-full rounded-3xl h-20 overflow-hidden mb-4"
           >
@@ -68,61 +46,9 @@ const Emergency = () => {
         ))}
       </View>
       {/* Map Section */}
-      <View
-        style={{
-          height: 300,
-          borderRadius: 16,
-          overflow: "hidden",
-          marginHorizontal: 16,
-          marginBottom: 16,
-          borderColor: "#f00",
-        }}
-      >
-        {location ? (
-          <MapView
-            style={{ flex: 1 }}
-            initialRegion={{
-              latitude: location.coords.latitude,
-              longitude: location.coords.longitude,
-              latitudeDelta: 0.01,
-              longitudeDelta: 0.01,
-            }}
-            showsUserLocation={true}
-            followsUserLocation={true}
-            showsCompass={true}
-            provider={MapView.PROVIDER_GOOGLE}
-          >
-            <Marker
-              coordinate={{
-                latitude: location.coords.latitude,
-                longitude: location.coords.longitude,
-              }}
-              title="Your Location"
-            />
-          </MapView>
-        ) : (
-          <View style={styles.loadingContainer}>
-            <Text>{errorMsg || "Loading map..."}</Text>
-          </View>
-        )}
-      </View>
+      <ShowMap />
     </ScrollView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  map: {
-    width: "100%",
-    height: "100%",
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-});
 
 export default Emergency;
