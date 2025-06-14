@@ -7,6 +7,7 @@ import OfficerLogin from "./Pages/Accounts/OfficerLogin";
 import FireHealthLogin from "./Pages/Accounts/FireHealthLogin";
 import Loader from "./Components/Loader";
 import NavBar from "./Components/NavBar";
+import EmergencyCalls from "./Pages/EmergencyCalls";
 
 function PrivateRoute({ children }) {
   const { isAuthenticated, loading } = useAuth();
@@ -30,6 +31,14 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path="/officer-login" element={<OfficerLogin />} />
         <Route path="/firehealth-login" element={<FireHealthLogin />} />
+        <Route
+          path="/emergency-calls"
+          element={
+            <PrivateRoute>
+              <EmergencyCalls />
+            </PrivateRoute>
+          }
+        />
       </Routes>
     </div>
   );

@@ -8,6 +8,7 @@ import { AuthContext } from "../Context/AuthContext"; // Import AuthContext
 const Links = [
   { name: "Home", path: "/" },
   { name: "About", path: "/about" },
+  { name: "Emergencies", path: "/emergency-calls" },
 ];
 
 function NavBar() {
