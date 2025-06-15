@@ -66,6 +66,12 @@ function EmergencyCalls() {
                   {call.user ? call.user.phone : call.phone || ""}
                 </td>
                 <td>
+                  {call.location.address ? (
+                    <span>
+                      {call.location.address}
+                      <br />
+                    </span>
+                  ) : null}
                   <a
                     href={`https://www.google.com/maps?q=${call.location.lat},${call.location.lng}`}
                     target="_blank"

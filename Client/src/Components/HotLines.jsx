@@ -17,12 +17,36 @@ async function sendEmergencyCall(service) {
       lng: location.coords.longitude,
     };
 
+    // Reverse geocode to get address
+    let address = "";
+    try {
+      let geocode = await Location.reverseGeocodeAsync({
+        latitude: coords.lat,
+        longitude: coords.lng,
+      });
+      if (geocode && geocode.length > 0) {
+        const place = geocode[0];
+        address = [
+          place.name,
+          place.street,
+          place.city,
+          place.region,
+          place.country,
+        ]
+          .filter(Boolean)
+          .join(", ");
+      }
+    } catch (err) {
+      // If geocoding fails, leave address blank
+      address = "";
+    }
+
     let token = await AsyncStorage.getItem("token");
     await axios.post(
       `${BackendLink}/emergency-call${token ? "" : "/anonymous"}`,
       {
         service,
-        location: coords,
+        location: { ...coords, address },
       },
       token ? { headers: { Authorization: `Bearer ${token}` } } : undefined
     );
