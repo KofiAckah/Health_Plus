@@ -41,6 +41,19 @@ export const getAllEmergencyCalls = async (req, res) => {
   }
 };
 
+export const getCallsByService = async (req, res) => {
+  try {
+    const { service } = req.params;
+    const calls = await EmergencyCall.find({ service })
+      .sort({ createdAt: -1 })
+      .populate("user", "name email phone");
+
+    res.status(200).json(calls);
+  } catch (err) {
+    res.status(500).json({ msg: "Failed to fetch calls", error: err.message });
+  }
+};
+
 // Officer changes the status of an emergency call
 export const updateEmergencyCallStatus = async (req, res) => {
   try {

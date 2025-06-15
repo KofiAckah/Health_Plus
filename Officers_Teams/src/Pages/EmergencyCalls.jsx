@@ -96,7 +96,7 @@ function EmergencyCalls() {
 
   return (
     <div className="p-4">
-      <h2 className="text-2xl font-bold mb-4">Live Emergency Calls</h2>
+      <h2 className="text-2xl font-bold mb-4">All Emergency Calls</h2>
       {loading ? (
         <p>Loading...</p>
       ) : calls.length === 0 ? (
@@ -149,7 +149,7 @@ function EmergencyCalls() {
                   <select
                     value={call.status}
                     onChange={(e) => handleStatusSelect(call, e.target.value)}
-                    className={`border rounded px-2 py-1 ${
+                    className={`border border-black rounded px-2 py-1 ${
                       call.status === "pending"
                         ? "bg-red-600 text-white"
                         : call.status === "active"
@@ -174,7 +174,7 @@ function EmergencyCalls() {
 
       {/* Confirmation Modal */}
       {confirmModal.open && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/40 backdrop-blur-sm">
           <div className="bg-white p-6 rounded shadow-lg max-w-sm w-full">
             <h3 className="text-lg font-bold mb-4">Confirm Status Change</h3>
             <p>

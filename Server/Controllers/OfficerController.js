@@ -117,7 +117,7 @@ export const policeProfile = async (req, res) => {
 
 export const fireHealthSignup = async (req, res) => {
   try {
-    const { name, email, soNumber, password } = req.body;
+    const { name, email, soNumber, password, role } = req.body;
 
     if (!name || !email || !soNumber || !password) {
       return res.status(400).json({ msg: "All fields are required." });
@@ -135,6 +135,7 @@ export const fireHealthSignup = async (req, res) => {
       email,
       password, // plain password, will be hashed by pre-save hook
       soNumber,
+      role, // optional, can be used to differentiate roles in FireHealth
     });
 
     await officer.save();
