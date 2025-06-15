@@ -25,8 +25,13 @@ const emergencyCallSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["pending", "acknowledged", "resolved"],
+      enum: ["pending", "active", "resolved"],
       default: "pending",
+    },
+    lastUpdatedBy: {
+      id: { type: mongoose.Schema.Types.ObjectId, ref: "Officer" },
+      name: String,
+      role: String,
     },
   },
   { timestamps: true }

@@ -6,6 +6,7 @@ import * as Location from "expo-location";
 const ShowMap = () => {
   const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
+  const [address, setAddress] = useState("");
 
   useEffect(() => {
     (async () => {
@@ -17,6 +18,29 @@ const ShowMap = () => {
 
       let location = await Location.getCurrentPositionAsync({});
       setLocation(location);
+
+      // Reverse geocode to get address
+      try {
+        let geocode = await Location.reverseGeocodeAsync({
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+        });
+        if (geocode && geocode.length > 0) {
+          const place = geocode[0];
+          const placeName = [
+            place.name,
+            place.street,
+            place.city,
+            place.region,
+            place.country,
+          ]
+            .filter(Boolean)
+            .join(", ");
+          setAddress(placeName);
+        }
+      } catch (err) {
+        setAddress("");
+      }
     })();
   }, []);
 
@@ -45,13 +69,14 @@ const ShowMap = () => {
           followsUserLocation={true}
           showsCompass={true}
           provider={MapView.PROVIDER_GOOGLE}
+          zoomControlEnabled={true}
         >
           <Marker
             coordinate={{
               latitude: location.coords.latitude,
               longitude: location.coords.longitude,
             }}
-            title="Your Location"
+            title={address || "Your Location"}
           />
         </MapView>
       ) : (

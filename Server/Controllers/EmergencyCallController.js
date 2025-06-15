@@ -40,3 +40,50 @@ export const getAllEmergencyCalls = async (req, res) => {
     res.status(500).json({ msg: "Failed to fetch calls", error: err.message });
   }
 };
+
+// Officer changes the status of an emergency call
+export const updateEmergencyCallStatus = async (req, res) => {
+  try {
+    const { callId } = req.params;
+    const { status } = req.body;
+
+    // Validate status
+    const validStatuses = ["pending", "active", "resolved"];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ msg: "Invalid status value" });
+    }
+
+    // Find and update the call
+    const call = await EmergencyCall.findById(callId);
+    if (!call) {
+      return res.status(404).json({ msg: "Emergency call not found" });
+    }
+
+    call.status = status;
+
+    // Get officer info from req.user (set by authMiddleware)
+    if (req.user) {
+      call.lastUpdatedBy = {
+        id: req.user.id,
+        name: req.user.name,
+        role: req.user.role,
+      };
+    }
+
+    await call.save();
+
+    // Optionally, emit update to dashboards
+    const io = req.app.get("io");
+    io.emit("emergency-call-status-updated", {
+      callId: call._id,
+      status: call.status,
+      officer: call.lastUpdatedBy,
+    });
+
+    res.status(200).json({ msg: "Status updated", call });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ msg: "Failed to update status", error: err.message });
+  }
+};

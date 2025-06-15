@@ -12,7 +12,7 @@ const Links = [
 ];
 
 function NavBar() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(true);
   const { isAuthenticated, logout } = useContext(AuthContext); // Get auth state and logout
   const navigate = useNavigate();
 
