@@ -16,6 +16,7 @@ import PostIssue from "../Screens/Socials/PostIssue";
 import IssueDetails from "../Screens/Socials/IssueDetails";
 // Settings Screens
 import Settings from "../Screens/Settings/Settings";
+import EditProfile from "../Screens/Settings/EditProfile";
 
 const Stack = createStackNavigator();
 
@@ -64,6 +65,7 @@ const StackScren = () => {
         {/* Settings Screen */}
         <>
           <Stack.Screen name="Settings" component={Settings} />
+          <Stack.Screen name="EditProfile" component={EditProfile} />
         </>
         {/* Help Screen */}
         <Stack.Screen name="Help" component={Help} />

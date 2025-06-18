@@ -35,7 +35,7 @@ export const SettingsData = [
     icon: faUser,
     info: "Manage your account, edit profile, and more",
     onPress: (navigation) => {
-      console.log("Account Edit");
+      navigation.navigate("EditProfile");
     },
   },
   {
