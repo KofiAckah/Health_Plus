@@ -25,6 +25,7 @@ import { BackendLink, Logo } from "../../Components/Default";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Picker } from "@react-native-picker/picker";
+import * as ImagePicker from "expo-image-picker";
 
 const EditProfile = () => {
   const navigation = useNavigation();
@@ -32,6 +33,8 @@ const EditProfile = () => {
   const [updating, setUpdating] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [tempDate, setTempDate] = useState(new Date());
+  const [removingImage, setRemovingImage] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -55,28 +58,55 @@ const EditProfile = () => {
     fetchUserData();
   }, []);
 
-  const handleUpdateProfile = () => {
+  const handleUpdateProfile = async () => {
     if (!userData) return;
 
-    const updateProfile = async () => {
-      setUpdating(true);
-      try {
-        const token = await AsyncStorage.getItem("token");
-        await axios.put(`${BackendLink}/profile`, userData, {
+    setUpdating(true);
+    try {
+      const token = await AsyncStorage.getItem("token");
+
+      // Use FormData if a new image is selected (uri starts with file:// or content://)
+      let formData;
+      let isMultipart = false;
+
+      if (
+        userData.profilePicture &&
+        (userData.profilePicture.startsWith("file://") ||
+          userData.profilePicture.startsWith("content://"))
+      ) {
+        formData = new FormData();
+        // Append all fields
+        Object.entries(userData).forEach(([key, value]) => {
+          if (key === "profilePicture") {
+            formData.append("profilePicture", {
+              uri: value,
+              name: "profile.jpg",
+              type: "image/jpeg",
+            });
+          } else if (value !== undefined && value !== null) {
+            formData.append(key, value);
+          }
+        });
+        isMultipart = true;
+      }
+
+      await axios.put(
+        `${BackendLink}/profile`,
+        isMultipart ? formData : userData,
+        {
           headers: {
             Authorization: `Bearer ${token}`,
+            ...(isMultipart && { "Content-Type": "multipart/form-data" }),
           },
-        });
-        Alert.alert("Success", "Profile updated!");
-      } catch (error) {
-        Alert.alert("Error", "Failed to update profile.");
-        console.error("Error updating profile:", error);
-      } finally {
-        setUpdating(false);
-      }
-    };
-
-    updateProfile();
+        }
+      );
+      Alert.alert("Success", "Profile updated!");
+    } catch (error) {
+      Alert.alert("Error", "Failed to update profile.");
+      console.error("Error updating profile:", error);
+    } finally {
+      setUpdating(false);
+    }
   };
 
   const handleDateChange = (event, selectedDate) => {
@@ -96,6 +126,37 @@ const EditProfile = () => {
       month: "long",
       day: "numeric",
     });
+  };
+
+  // Pick and upload a new profile picture
+  const handleChangeProfilePicture = async () => {
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permissionResult.granted) {
+      Alert.alert("Permission required", "Please allow access to your photos.");
+      return;
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+    if (!result.canceled && result.assets && result.assets[0].uri) {
+      setUserData((prev) => ({
+        ...prev,
+        profilePicture: result.assets[0].uri,
+      }));
+    }
+  };
+
+  // Remove profile picture
+  const handleRemoveProfilePicture = () => {
+    setUserData((prev) => ({
+      ...prev,
+      profilePicture: "",
+      removeProfilePicture: "true",
+    }));
   };
 
   if (!userData) {
@@ -135,30 +196,43 @@ const EditProfile = () => {
             <View className="w-40 h-40 rounded-full border-4 border-secondary-100 bg-secondary-200 overflow-hidden items-center justify-center relative">
               {userData.profilePicture ? (
                 <Image
-                  source={
-                    userData.profilePicture
-                      ? { uri: userData.profilePicture }
-                      : Logo
-                  }
+                  source={{ uri: userData.profilePicture }}
                   className="w-40 h-40"
                   resizeMode="cover"
                 />
               ) : (
                 <FontAwesomeIcon icon={faUser} size={80} color="#b0b8c1" />
               )}
+              {(uploadingImage || removingImage) && (
+                <View className="absolute inset-0 bg-black/40 items-center justify-center">
+                  <ActivityIndicator size="large" color="#fff" />
+                </View>
+              )}
             </View>
-            <TouchableOpacity
-              className="absolute bottom-2 left-[62%] bg-primary-200 p-2 rounded-full z-10"
-              onPress={() => Alert.alert("Profile picture change coming soon!")}
-            >
-              <FontAwesomeIcon icon={faCamera} size={16} color="#fff" />
-            </TouchableOpacity>
+            <View className="flex-row mt-3 space-x-4">
+              <TouchableOpacity
+                className="bg-primary-200 p-2 rounded-full"
+                onPress={handleChangeProfilePicture}
+                disabled={uploadingImage || removingImage}
+              >
+                <FontAwesomeIcon icon={faCamera} size={16} color="#fff" />
+              </TouchableOpacity>
+              {userData.profilePicture ? (
+                <TouchableOpacity
+                  className="bg-red-500 p-2 rounded-full ml-2"
+                  onPress={handleRemoveProfilePicture}
+                  disabled={removingImage || uploadingImage}
+                >
+                  <FontAwesomeIcon icon={faBan} size={16} color="#fff" />
+                </TouchableOpacity>
+              ) : null}
+            </View>
           </View>
 
           {/* Form Fields */}
           <View className="px-6 mt-2">
             <Text className="text-primary-100 text-base font-semibold mt-2 mb-1">
-              Name
+              Nam
             </Text>
             <TextInput
               className="bg-secondary-200 rounded-lg px-4 py-3 mb-3 text-primary-300 "

@@ -107,19 +107,19 @@ export const UpdateProfile = async (req, res) => {
 };
 
 // Checking if uploading image to cloudinary is working or not
-export const UploadImage = async (req, res) => {
-  try {
-    if (!req.files || Object.keys(req.files).length === 0) {
-      return res.status(400).send("No files were uploaded.");
-    }
-    const file = req.files.image;
-    const imageUrl = await uploadHandler(file);
+// export const UploadImage = async (req, res) => {
+//   try {
+//     if (!req.files || Object.keys(req.files).length === 0) {
+//       return res.status(400).send("No files were uploaded.");
+//     }
+//     const file = req.files.image;
+//     const imageUrl = await uploadHandler(file);
 
-    res.status(200).send({
-      message: "File uploaded successfully",
-      url: imageUrl,
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+//     res.status(200).send({
+//       message: "File uploaded successfully",
+//       url: imageUrl,
+//     });
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// };

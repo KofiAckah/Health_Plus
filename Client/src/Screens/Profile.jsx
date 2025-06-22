@@ -9,7 +9,8 @@ import {
 } from "react-native";
 import axios from "axios";
 import { useState, useEffect } from "react";
-import { useNavigation } from "@react-navigation/native";
+import React from "react";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { BackendLink } from "../Components/Default";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
@@ -19,23 +20,25 @@ const Profile = () => {
   const navigation = useNavigation();
   const [userData, setUserData] = useState(null);
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const token = await AsyncStorage.getItem("token");
-        const response = await axios.get(`${BackendLink}/profile`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setUserData(response.data);
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-      }
-    };
+  const fetchUserData = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const response = await axios.get(`${BackendLink}/profile`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setUserData(response.data);
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  };
 
-    fetchUserData();
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchUserData();
+    }, [])
+  );
 
   if (!userData) {
     return (
