@@ -6,7 +6,6 @@ import { ActivityIndicator, View } from "react-native";
 
 // Screens
 import BottomTab from "./BottomTab";
-import Help from "../Screens/Help";
 // Accounts Screens
 import Signup from "../Screens/Accounts/Signup";
 import Login from "../Screens/Accounts/Login";
@@ -17,6 +16,8 @@ import IssueDetails from "../Screens/Socials/IssueDetails";
 // Settings Screens
 import Settings from "../Screens/Settings/Settings";
 import EditProfile from "../Screens/Settings/EditProfile";
+import Notification from "../Screens/Settings/Notification";
+import Help from "../Screens/Settings/Help";
 
 const Stack = createStackNavigator();
 
@@ -66,9 +67,10 @@ const StackScren = () => {
         <>
           <Stack.Screen name="Settings" component={Settings} />
           <Stack.Screen name="EditProfile" component={EditProfile} />
+          <Stack.Screen name="Notification" component={Notification} />
+          <Stack.Screen name="Help" component={Help} />
         </>
         {/* Help Screen */}
-        <Stack.Screen name="Help" component={Help} />
       </Stack.Navigator>
     </NavigationContainer>
   );

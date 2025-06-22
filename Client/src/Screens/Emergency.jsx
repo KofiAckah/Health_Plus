@@ -39,7 +39,7 @@ const Emergency = () => {
               </View>
               <Image
                 source={item.image}
-                className="w-24 h-24 mb-2 absolute top-0 right-0 bottom-0 m-auto opacity-40"
+                className="w-20 h-20 absolute right-0 opacity-40"
               />
             </LinearGradient>
           </TouchableOpacity>

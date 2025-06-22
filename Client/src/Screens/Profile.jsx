@@ -1,4 +1,12 @@
-import { View, Text, Image, TouchableOpacity, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+  ActivityIndicator,
+  SafeAreaView,
+} from "react-native";
 import axios from "axios";
 import { useState, useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
@@ -28,6 +36,14 @@ const Profile = () => {
 
     fetchUserData();
   }, []);
+
+  if (!userData) {
+    return (
+      <SafeAreaView className="flex-1 bg-white justify-center items-center">
+        <ActivityIndicator size="large" color="#11D6CD" />
+      </SafeAreaView>
+    );
+  }
 
   return (
     <ScrollView className="flex-1 bg-white">

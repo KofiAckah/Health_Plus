@@ -36,6 +36,9 @@ export const UpdateProfile = async (req, res) => {
       gender,
       location,
       hometown,
+      dateOfBirth,
+      occupation,
+      bloodGroup,
       bio,
       removeProfilePicture,
     } = req.body;
@@ -46,6 +49,10 @@ export const UpdateProfile = async (req, res) => {
     user.gender = gender !== undefined ? gender : user.gender;
     user.location = location !== undefined ? location : user.location;
     user.hometown = hometown !== undefined ? hometown : user.hometown;
+    user.dateOfBirth =
+      dateOfBirth !== undefined ? dateOfBirth : user.dateOfBirth;
+    user.occupation = occupation !== undefined ? occupation : user.occupation;
+    user.bloodGroup = bloodGroup !== undefined ? bloodGroup : user.bloodGroup;
     user.bio = bio !== undefined ? bio : user.bio;
 
     // Handle profile picture removal

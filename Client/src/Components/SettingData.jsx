@@ -1,11 +1,15 @@
 import {
   faUser,
-  faRightFromBracket,
+  faTriangleExclamation,
   faLock,
+  faRightFromBracket,
+  faCircleQuestion,
+  faListCheck,
 } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { BackendLink } from "./Default";
+import { Alert } from "react-native";
 
 // Pass navigation to onPress if you want to navigate after logout
 export const handleLogout = async (navigation) => {
@@ -40,27 +44,28 @@ export const SettingsData = [
   },
   {
     name: "Notifications",
-    icon: faUser,
+    icon: faTriangleExclamation,
     info: "Manage your notification preferences",
-    onPress: () => console.log("Hello Notifications"),
-  },
-  {
-    name: "Privacy",
-    icon: faUser,
-    info: "Manage your privacy settings",
-    onPress: () => console.log("Hello Privacy"),
+    // onPress: (navigation) => {
+    //   navigation.navigate("Notification");
+    // },
+    onPress: () =>
+      Alert.alert("Notifications", "This feature is under development."),
   },
   {
     name: "Security",
     icon: faLock,
     info: "Manage your security settings",
-    onPress: () => console.log("Hello Security"),
+    onPress: () =>
+      Alert.alert("Security", "This feature is under development."),
   },
   {
     name: "Help",
-    icon: faUser,
+    icon: faCircleQuestion,
     info: "Help and support",
-    onPress: () => console.log("Hello Help"),
+    onPress: (navigation) => {
+      navigation.navigate("Help");
+    },
   },
   {
     name: "About",
@@ -70,15 +75,10 @@ export const SettingsData = [
   },
   {
     name: "Terms and Conditions",
-    icon: faUser,
+    icon: faListCheck,
     info: "Read our terms and conditions",
-    onPress: () => console.log("Hello Terms"),
-  },
-  {
-    name: "Privacy Policy",
-    icon: faUser,
-    info: "Read our privacy policy",
-    onPress: () => console.log("Hello Privacy"),
+    onPress: () =>
+      Alert.alert("Terms and Conditions", "This feature is under development."),
   },
   {
     name: "Logout",
