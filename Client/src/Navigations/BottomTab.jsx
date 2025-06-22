@@ -35,20 +35,21 @@ const BottomTab = () => {
             <FontAwesomeIcon
               icon={iconName}
               size={(size = focused ? 28 : 22)}
-              color={(color = focused ? "#f5f5f5" : "#f5f5f5")}
+              color={(color = focused ? "#023e8a" : "#f5f5f5")}
               // color={(color = focused ? "#f5f5f5" : "#cbeef3")}
             />
           );
         },
         tabBarLabelStyle: {
-          color: "#f5f5f5",
           fontSize: 11,
           fontWeight: "bold",
           fontFamily: "San-Serif",
           textAlign: "center",
         },
-        tabBarActiveBackgroundColor: "#4a4a4a",
-        tabBarInactiveBackgroundColor: "#0071BD",
+        tabBarActiveTintColor: "#023e8a",
+        tabBarInactiveTintColor: "#f5f5f5",
+        tabBarActiveBackgroundColor: "#ade8f4",
+        tabBarInactiveBackgroundColor: "#023e8a",
         headerShown: false,
         tabBarStyle: {
           position: "absolute",

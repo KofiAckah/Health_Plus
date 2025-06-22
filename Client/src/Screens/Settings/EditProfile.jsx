@@ -23,11 +23,15 @@ import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
 import { BackendLink, Logo } from "../../Components/Default";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { Picker } from "@react-native-picker/picker";
 
 const EditProfile = () => {
   const navigation = useNavigation();
   const [userData, setUserData] = useState(null);
   const [updating, setUpdating] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [tempDate, setTempDate] = useState(new Date());
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -39,6 +43,10 @@ const EditProfile = () => {
           },
         });
         setUserData(response.data);
+        // Initialize tempDate with user's date of birth if available
+        if (response.data.dateOfBirth) {
+          setTempDate(new Date(response.data.dateOfBirth));
+        }
       } catch (error) {
         console.error("Error fetching user data:", error);
       }
@@ -69,6 +77,25 @@ const EditProfile = () => {
     };
 
     updateProfile();
+  };
+
+  const handleDateChange = (event, selectedDate) => {
+    setShowDatePicker(false);
+    if (selectedDate) {
+      setTempDate(selectedDate);
+      const formattedDate = selectedDate.toISOString().split("T")[0];
+      setUserData({ ...userData, dateOfBirth: formattedDate });
+    }
+  };
+
+  const formatDisplayDate = (dateString) => {
+    if (!dateString) return "Select your date of birth";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
   };
 
   if (!userData) {
@@ -207,19 +234,30 @@ const EditProfile = () => {
             <Text className="text-primary-100 text-base font-semibold mb-1">
               Date of Birth
             </Text>
-            <TextInput
-              className="bg-secondary-200 rounded-lg px-4 py-3 mb-3 text-primary-300"
-              value={userData.dateOfBirth || ""}
-              onChangeText={(v) => setUserData({ ...userData, dateOfBirth: v })}
-              placeholder="Enter your date of birth"
-              placeholderTextColor="#b0b8c1"
-              keyboardType="numeric"
-              maxLength={10} // For format: YYYY-MM-DD
-              onBlur={() => {
-                // Optional: auto-format or validate date here
-                // You can add a regex check if you want strict format
-              }}
-            />
+            <TouchableOpacity
+              className="bg-secondary-200 rounded-lg px-4 py-3 mb-3"
+              onPress={() => setShowDatePicker(true)}
+            >
+              <Text
+                className={`${
+                  userData?.dateOfBirth
+                    ? "text-primary-300"
+                    : "text-secondary-100"
+                }`}
+              >
+                {formatDisplayDate(userData?.dateOfBirth)}
+              </Text>
+            </TouchableOpacity>
+
+            {showDatePicker && (
+              <DateTimePicker
+                value={tempDate}
+                mode="date"
+                display={Platform.OS === "ios" ? "spinner" : "default"}
+                maximumDate={new Date()}
+                onChange={handleDateChange}
+              />
+            )}
 
             <Text className="text-primary-100 text-base font-semibold mb-1">
               Occupation
@@ -235,24 +273,60 @@ const EditProfile = () => {
             <Text className="text-primary-100 text-base font-semibold mb-1">
               Blood Group
             </Text>
-            <TextInput
-              className="bg-secondary-200 rounded-lg px-4 py-3 mb-3 text-primary-300"
-              value={userData.bloodGroup || ""}
-              onChangeText={(v) => setUserData({ ...userData, bloodGroup: v })}
-              placeholder="Enter your blood group"
-              placeholderTextColor="#b0b8c1"
-            />
+            <View className="bg-secondary-200 rounded-lg mb-3">
+              <Picker
+                selectedValue={userData.bloodGroup || "Unknown"}
+                onValueChange={(itemValue) =>
+                  setUserData({ ...userData, bloodGroup: itemValue })
+                }
+                style={{
+                  color: userData.bloodGroup ? "#1e293b" : "#b0b8c1",
+                }}
+              >
+                <Picker.Item
+                  label="Select your blood group"
+                  value=""
+                  color="#b0b8c1"
+                />
+                <Picker.Item label="A+" value="A+" />
+                <Picker.Item label="A-" value="A-" />
+                <Picker.Item label="B+" value="B+" />
+                <Picker.Item label="B-" value="B-" />
+                <Picker.Item label="AB+" value="AB+" />
+                <Picker.Item label="AB-" value="AB-" />
+                <Picker.Item label="O+" value="O+" />
+                <Picker.Item label="O-" value="O-" />
+                <Picker.Item label="Unknown" value="Unknown" />
+              </Picker>
+            </View>
 
             <Text className="text-primary-100 text-base font-semibold mb-1">
               Gender
             </Text>
-            <TextInput
-              className="bg-secondary-200 rounded-lg px-4 py-3 mb-3 text-primary-300"
-              value={userData.gender || ""}
-              onChangeText={(v) => setUserData({ ...userData, gender: v })}
-              placeholder="Enter your gender"
-              placeholderTextColor="#b0b8c1"
-            />
+            <View className="bg-secondary-200 rounded-lg mb-3">
+              <Picker
+                selectedValue={userData.gender || ""}
+                onValueChange={(itemValue) =>
+                  setUserData({ ...userData, gender: itemValue })
+                }
+                style={{
+                  color: userData.gender ? "#1e293b" : "#b0b8c1",
+                }}
+              >
+                <Picker.Item
+                  label="Select your gender"
+                  value=""
+                  color="#b0b8c1"
+                  disabled={true}
+                />
+                <Picker.Item label="Male" value="Male" />
+                <Picker.Item label="Female" value="Female" />
+                <Picker.Item
+                  label="Prefer not to say"
+                  value="Prefer not to say"
+                />
+              </Picker>
+            </View>
           </View>
           <View className="h-10" />
         </ScrollView>
