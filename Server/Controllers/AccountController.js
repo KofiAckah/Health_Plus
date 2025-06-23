@@ -38,33 +38,42 @@ export const SignUp = async (req, res) => {
     // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ msg: "User already exists" });
-    } else {
-      const newUser = new User({
-        name,
-        email,
-        password,
-        OTP,
-      });
-      await newUser.save();
-
-      // Schedule OTP deletion after 10 minutes
-      setTimeout(async () => {
-        try {
-          await User.updateOne({ email }, { $set: { OTP: null } });
-          console.log(`OTP for ${email} has been deleted and set to null.`);
-        } catch (error) {
-          console.error(`Failed to delete OTP for ${email}:`, error);
-        }
-      }, 10 * 60 * 1000);
-
-      // Send verification email
-      // -------------------------------------
-      // Uncomment the following line to send verification email since I am coding
-      // await sendVerificationEmail(email, OTP);
-      // -------------------------------------
-      return res.status(201).json({ msg: "User registered successfully" });
+      if (existingUser.isVerified) {
+        // User is verified, block signup
+        return res
+          .status(400)
+          .json({ msg: "User already exists and is verified" });
+      } else {
+        // User is not verified, delete the account and allow signup
+        await User.deleteOne({ email });
+      }
     }
+
+    // Create new user
+    const newUser = new User({
+      name,
+      email,
+      password,
+      OTP,
+    });
+    await newUser.save();
+
+    // Schedule OTP deletion after 10 minutes
+    setTimeout(async () => {
+      try {
+        await User.updateOne({ email }, { $set: { OTP: null } });
+        console.log(`OTP for ${email} has been deleted and set to null.`);
+      } catch (error) {
+        console.error(`Failed to delete OTP for ${email}:`, error);
+      }
+    }, 10 * 60 * 1000);
+
+    // Send verification email
+    // -------------------------------------
+    // Uncomment the following line to send verification email since I am coding
+    // await sendVerificationEmail(email, OTP);
+    // -------------------------------------
+    return res.status(201).json({ msg: "User registered successfully" });
   } catch (error) {
     console.error("Error in Register:", error);
     res.status(500).json({ msg: "Internal Server Error" });
@@ -119,6 +128,7 @@ export const VerifyOTP = async (req, res) => {
       return res.status(400).json({ msg: "Email and OTP are required" });
     }
 
+    console.log("typeof OTP:", typeof OTP);
     // Check if user exists
     const existingUser = await User.findOne({ email });
     if (!existingUser) {

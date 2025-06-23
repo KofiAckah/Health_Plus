@@ -10,6 +10,7 @@ import BottomTab from "./BottomTab";
 import Signup from "../Screens/Accounts/Signup";
 import Login from "../Screens/Accounts/Login";
 import ForgetPassword from "../Screens/Accounts/ForgetPassword";
+import VerifyEmail from "../Screens/Accounts/VerifyEmail";
 // Socials Screens
 import PostIssue from "../Screens/Socials/PostIssue";
 import IssueDetails from "../Screens/Socials/IssueDetails";
@@ -57,6 +58,7 @@ const StackScren = () => {
           <Stack.Screen name="Login" component={Login} />
           <Stack.Screen name="Signup" component={Signup} />
           <Stack.Screen name="ForgetPassword" component={ForgetPassword} />
+          <Stack.Screen name="VerifyEmail" component={VerifyEmail} />
         </>
         {/* Socials Screen */}
         <>
