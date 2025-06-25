@@ -6,6 +6,7 @@ import { ActivityIndicator, View } from "react-native";
 
 // Screens
 import BottomTab from "./BottomTab";
+import GeminiChat from "../Screens/GeminiChat";
 // Accounts Screens
 import Signup from "../Screens/Accounts/Signup";
 import Login from "../Screens/Accounts/Login";
@@ -53,6 +54,7 @@ const StackScren = () => {
         initialRouteName={initialRoute}
       >
         <Stack.Screen name="BottomTab" component={BottomTab} />
+        <Stack.Screen name="GeminiChat" component={GeminiChat} />
         {/* Accounts Screen */}
         <>
           <Stack.Screen name="Login" component={Login} />
