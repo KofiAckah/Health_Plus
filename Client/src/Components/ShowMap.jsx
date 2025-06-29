@@ -1,13 +1,26 @@
 import { View, Text, StyleSheet } from "react-native";
 import { useState, useEffect } from "react";
-import MapView, { Marker } from "react-native-maps";
+import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import * as Location from "expo-location";
 
-const ShowMap = () => {
+const ShowMap = ({
+  showLocations = { police: false, fire: false, hospital: false },
+}) => {
   const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
   const [address, setAddress] = useState("");
+  const [places, setPlaces] = useState({
+    police: [],
+    fire: [],
+    hospital: [],
+  });
+  const [loading, setLoading] = useState({
+    police: false,
+    fire: false,
+    hospital: false,
+  });
 
+  // Get current location
   useEffect(() => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
@@ -44,16 +57,83 @@ const ShowMap = () => {
     })();
   }, []);
 
+  // Effect to load places when showLocations changes
+  useEffect(() => {
+    if (location) {
+      if (showLocations.police && places.police.length === 0) {
+        findNearbyPlaces("police");
+      }
+      if (showLocations.fire && places.fire.length === 0) {
+        findNearbyPlaces("fire_station");
+      }
+      if (showLocations.hospital && places.hospital.length === 0) {
+        findNearbyPlaces("hospital");
+      }
+    }
+  }, [location, showLocations]);
+
+  // Search for nearby places by type
+  const findNearbyPlaces = async (type) => {
+    if (!location) return;
+
+    const typeKey = type === "fire_station" ? "fire" : type;
+
+    setLoading((prev) => ({ ...prev, [typeKey]: true }));
+
+    try {
+      const apiKey = "YOUR_GOOGLE_MAPS_API_KEY"; // Replace with your actual API key
+      const lat = location.coords.latitude;
+      const lng = location.coords.longitude;
+      const radius = 10000; // 10km radius
+
+      const url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=${radius}&type=${type}&key=${apiKey}`;
+
+      const response = await fetch(url);
+      const result = await response.json();
+
+      if (result.status === "OK") {
+        setPlaces((prev) => ({
+          ...prev,
+          [typeKey]: result.results.map((place) => ({
+            id: place.place_id,
+            name: place.name,
+            latitude: place.geometry.location.lat,
+            longitude: place.geometry.location.lng,
+            vicinity: place.vicinity,
+          })),
+        }));
+      } else {
+        console.error(`Error fetching ${type}:`, result.status);
+      }
+    } catch (error) {
+      console.error(`Error finding ${type}:`, error);
+    } finally {
+      setLoading((prev) => ({ ...prev, [typeKey]: false }));
+    }
+  };
+
+  // Pin colors based on place type
+  const getPinColor = (type) => {
+    switch (type) {
+      case "police":
+        return "#023e8a";
+      case "fire":
+        return "#ff0000";
+      case "hospital":
+        return "#228B22";
+      default:
+        return "#ff8c00";
+    }
+  };
+
   return (
     <View
       style={{
-        height: 300,
+        height: 350,
         borderRadius: 16,
         overflow: "hidden",
         marginHorizontal: 16,
         marginBottom: 16,
-        // borderColor: "#f00",
-        // borderWidth: 1,
       }}
     >
       {location ? (
@@ -62,22 +142,70 @@ const ShowMap = () => {
           initialRegion={{
             latitude: location.coords.latitude,
             longitude: location.coords.longitude,
-            latitudeDelta: 0.01,
-            longitudeDelta: 0.01,
+            latitudeDelta: 0.015,
+            longitudeDelta: 0.015,
           }}
           showsUserLocation={true}
           followsUserLocation={true}
           showsCompass={true}
-          provider={MapView.PROVIDER_GOOGLE}
+          provider={PROVIDER_GOOGLE}
           zoomControlEnabled={true}
         >
+          {/* Current location marker */}
           <Marker
             coordinate={{
               latitude: location.coords.latitude,
               longitude: location.coords.longitude,
             }}
             title={address || "Your Location"}
+            description="You are here"
+            pinColor="#ff8c00"
           />
+
+          {/* Police station markers */}
+          {showLocations.police &&
+            places.police.map((place) => (
+              <Marker
+                key={place.id}
+                coordinate={{
+                  latitude: place.latitude,
+                  longitude: place.longitude,
+                }}
+                title={place.name}
+                description={place.vicinity}
+                pinColor={getPinColor("police")}
+              />
+            ))}
+
+          {/* Fire station markers */}
+          {showLocations.fire &&
+            places.fire.map((place) => (
+              <Marker
+                key={place.id}
+                coordinate={{
+                  latitude: place.latitude,
+                  longitude: place.longitude,
+                }}
+                title={place.name}
+                description={place.vicinity}
+                pinColor={getPinColor("fire")}
+              />
+            ))}
+
+          {/* Hospital markers */}
+          {showLocations.hospital &&
+            places.hospital.map((place) => (
+              <Marker
+                key={place.id}
+                coordinate={{
+                  latitude: place.latitude,
+                  longitude: place.longitude,
+                }}
+                title={place.name}
+                description={place.vicinity}
+                pinColor={getPinColor("hospital")}
+              />
+            ))}
         </MapView>
       ) : (
         <View style={styles.loadingContainer}>

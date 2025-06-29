@@ -16,7 +16,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
 
 const ai = new GoogleGenAI({
-  apiKey: "YOUR_GOOGLE_GENAI_API_KEY", // Replace with your actual API key
+  apiKey: "YOUR_API_KEY_HERE", // Replace with your actual API key
 });
 
 const BOT_AVATAR = "https://cdn-icons-png.flaticon.com/512/4712/4712035.png"; // Example bot avatar
