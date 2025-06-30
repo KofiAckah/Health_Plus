@@ -23,7 +23,12 @@ const emergencyCallSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
-    status: {
+    statusByPersonnel: {
+      type: String,
+      enum: ["pending", "active", "resolved"],
+      default: "pending",
+    },
+    statusByUser: {
       type: String,
       enum: ["pending", "active", "resolved"],
       default: "pending",
