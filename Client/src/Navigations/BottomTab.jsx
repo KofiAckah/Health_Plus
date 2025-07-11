@@ -6,6 +6,8 @@ import {
   faFirstAid,
   faUserFriends,
   faUser,
+  faPhone,
+  faP,
 } from "@fortawesome/free-solid-svg-icons";
 
 // Screens
@@ -13,6 +15,7 @@ import Emergency from "../Screens/Emergency";
 import FirstAid from "../Screens/FirstAid";
 import Social from "../Screens/Social";
 import Profile from "../Screens/Profile";
+import CallLog from "../Screens/CallLog";
 
 const Tab = createBottomTabNavigator();
 
@@ -30,18 +33,20 @@ const BottomTab = () => {
             iconName = faUserFriends;
           } else if (route.name === "Profile") {
             iconName = faUser;
+          } else if (route.name === "Call Log") {
+            iconName = faPhone;
           }
           return (
             <FontAwesomeIcon
               icon={iconName}
-              size={(size = focused ? 28 : 22)}
+              size={(size = focused ? 25 : 20)}
               color={(color = focused ? "#023e8a" : "#f5f5f5")}
               // color={(color = focused ? "#f5f5f5" : "#cbeef3")}
             />
           );
         },
         tabBarLabelStyle: {
-          fontSize: 11,
+          fontSize: 10,
           fontWeight: "bold",
           fontFamily: "San-Serif",
           textAlign: "center",
@@ -67,6 +72,7 @@ const BottomTab = () => {
       <Tab.Screen name="Emergency" component={Emergency} />
       <Tab.Screen name="FirstAid" component={FirstAid} />
       <Tab.Screen name="Social" component={Social} />
+      <Tab.Screen name="Call Log" component={CallLog} />
       <Tab.Screen name="Profile" component={Profile} />
     </Tab.Navigator>
   );

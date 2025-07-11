@@ -3,6 +3,7 @@ import {
   createEmergencyCall,
   getAllEmergencyCalls,
   getCallsByService,
+  getCallsByUser,
   updateEmergencyCallStatusByPersonnel,
   updateEmergencyCallStatusByUser,
 } from "../Controllers/EmergencyCallController.js";
@@ -14,6 +15,7 @@ router.post("/", authMiddleware, createEmergencyCall); // user must be logged in
 router.post("/anonymous", createEmergencyCall); // allow anonymous (no auth)
 router.get("/", getAllEmergencyCalls); // officers dashboard
 router.get("/service/:service", getCallsByService); // get calls by service type
+router.get("/user", authMiddleware, getCallsByUser); // get calls by logged in user
 router.put(
   "/:callId/status/personnel",
   authMiddleware,
