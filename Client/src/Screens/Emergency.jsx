@@ -14,9 +14,9 @@ import { HotlinesData } from "../Components/HotLines";
 import ShowMap from "../Components/ShowMap";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
-  faHandcuffs,
-  faFireExtinguisher,
-  faHospital,
+  faFire,
+  faHeartPulse,
+  faShieldAlt,
 } from "@fortawesome/free-solid-svg-icons";
 
 const Emergency = () => {
@@ -86,7 +86,7 @@ const Emergency = () => {
               onPress={() => toggleLocationType("police")}
             >
               <FontAwesomeIcon
-                icon={faHandcuffs}
+                icon={faShieldAlt}
                 size={18}
                 color={showLocations.police ? "#fff" : "#023e8a"}
                 style={{ marginRight: 5 }}
@@ -108,7 +108,7 @@ const Emergency = () => {
               onPress={() => toggleLocationType("fire")}
             >
               <FontAwesomeIcon
-                icon={faFireExtinguisher}
+                icon={faFire}
                 size={18}
                 color={showLocations.fire ? "#fff" : "#023e8a"}
                 style={{ marginRight: 5 }}
@@ -130,7 +130,7 @@ const Emergency = () => {
               onPress={() => toggleLocationType("hospital")}
             >
               <FontAwesomeIcon
-                icon={faHospital}
+                icon={faHeartPulse}
                 size={18}
                 color={showLocations.hospital ? "#fff" : "#023e8a"}
                 style={{ marginRight: 5 }}

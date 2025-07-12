@@ -1,11 +1,10 @@
 import {
   View,
   Text,
-  ScrollView,
+  FlatList,
   Alert,
   TouchableOpacity,
   SafeAreaView,
-  RefreshControl,
   Modal,
 } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
@@ -13,13 +12,13 @@ import {
   faShieldAlt,
   faFire,
   faHeartPulse,
-  faArrowLeft,
 } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 import { BackendLink } from "../Components/Default";
 import { useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
+import { format } from "date-fns";
 
 const CallLog = () => {
   const navigation = useNavigation();
@@ -28,6 +27,7 @@ const CallLog = () => {
   const [selectedCall, setSelectedCall] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [updatingStatus, setUpdatingStatus] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   // Fetch user's call logs
   const fetchCalls = async () => {
@@ -42,17 +42,26 @@ const CallLog = () => {
       console.error("Error fetching call logs:", error);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
+  };
+
+  // Handle refresh
+  const handleRefresh = () => {
+    setRefreshing(true);
+    fetchCalls();
   };
 
   useEffect(() => {
     fetchCalls();
   }, []);
 
-  // Format time from timestamp
+  // Format time from timestamp using date-fns
   const formatTime = (timestamp) => {
+    if (!timestamp) return "";
     const date = new Date(timestamp);
-    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    // Format as "25/06/25 11:30am"
+    return format(date, "MM/dd/yy h:mma").toLowerCase();
   };
 
   // Get icon for service type
@@ -73,11 +82,11 @@ const CallLog = () => {
   const getStatusColor = (status) => {
     switch (status) {
       case "active":
-        return "#22c55e"; // green
+        return "#eab308"; // yellow
       case "resolved":
         return "#22c55e"; // green
       case "pending":
-        return "#eab308"; // yellow
+        return "#ef4444"; // red
       default:
         return "#9ca3af"; // gray
     }
@@ -130,6 +139,61 @@ const CallLog = () => {
     }
   };
 
+  // Render each emergency call item
+  const renderCallItem = ({ item: call }) => (
+    <View
+      key={call._id}
+      className="flex-row items-center py-5 border-b border-gray-100"
+    >
+      <View className="bg-gray-100 rounded-lg p-4 mr-3">
+        <FontAwesomeIcon
+          icon={getServiceIcon(call.service)}
+          size={24}
+          color="#000"
+        />
+      </View>
+
+      <View className="flex-1">
+        <Text className="text-lg font-semibold">
+          {call.service?.replace(" Service", "")}
+        </Text>
+        <View className="flex-row items-center mr-2">
+          <Text className="text-xs text-gray-500">
+            {formatTime(call.timestamp)}
+          </Text>
+          <Text className="text-xs text-gray-500 mx-1 ml-2">•</Text>
+          <Text className="text-xs text-gray-500 flex-1 line-clamp-1">
+            {call.location?.address}
+          </Text>
+        </View>
+      </View>
+
+      <TouchableOpacity
+        className="items-end"
+        onPress={() => {
+          setSelectedCall(call);
+          setModalVisible(true);
+        }}
+      >
+        <Text
+          className="w-16 p-1 rounded-lg text-center text-white"
+          style={{
+            backgroundColor: getStatusColor(call.statusByUser),
+          }}
+        >
+          {getStatusLabel(call.statusByUser)}
+        </Text>
+      </TouchableOpacity>
+    </View>
+  );
+
+  // Empty list component
+  const EmptyListComponent = () => (
+    <Text className="text-center text-gray-500 py-6">
+      No emergency calls found
+    </Text>
+  );
+
   const displayCalls = calls.length > 0 ? calls : [];
 
   if (loading && calls.length === 0) {
@@ -146,70 +210,16 @@ const CallLog = () => {
         <Text className="text-xl font-bold flex-1 text-center">Call Log</Text>
       </View>
 
-      <ScrollView
+      <FlatList
+        data={displayCalls}
+        renderItem={renderCallItem}
+        keyExtractor={(item) => item._id}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 64 }}
+        refreshing={refreshing}
+        onRefresh={handleRefresh}
+        ListEmptyComponent={EmptyListComponent}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 20 }}
-        refreshControl={
-          <RefreshControl refreshing={loading} onRefresh={fetchCalls} />
-        }
-      >
-        <View className="px-4">
-          {displayCalls.length === 0 ? (
-            <Text className="text-center text-gray-500 py-6">
-              No emergency calls found
-            </Text>
-          ) : (
-            displayCalls.map((call) => (
-              <TouchableOpacity
-                key={call._id}
-                className="flex-row items-center py-5 border-b border-gray-100"
-                onPress={() => {
-                  setSelectedCall(call);
-                  setModalVisible(true);
-                }}
-              >
-                <View className="bg-gray-100 rounded-lg p-4 mr-3">
-                  <FontAwesomeIcon
-                    icon={getServiceIcon(call.service)}
-                    size={24}
-                    color="#000"
-                  />
-                </View>
-
-                <View className="flex-1">
-                  <Text className="text-lg font-medium">
-                    {call.service?.replace(" Service", "")}
-                  </Text>
-                  <View className="flex-row items-center">
-                    <Text className="text-sm text-gray-500">
-                      {formatTime(call.timestamp)}
-                    </Text>
-                    <Text className="text-sm text-gray-500 mx-1">•</Text>
-                    <Text className="text-sm text-gray-500 flex-1 line-clamp-1">
-                      {call.location?.address}
-                    </Text>
-                  </View>
-                </View>
-
-                <View className="items-end">
-                  <View
-                    style={{
-                      width: 12,
-                      height: 12,
-                      borderRadius: 6,
-                      backgroundColor: getStatusColor(call.statusByUser),
-                      marginBottom: 4,
-                    }}
-                  />
-                  <Text className="text-xs text-gray-500">
-                    {getStatusLabel(call.statusByUser)}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            ))
-          )}
-        </View>
-      </ScrollView>
+      />
 
       {/* Status Change Modal */}
       <Modal
@@ -218,7 +228,7 @@ const CallLog = () => {
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
       >
-        <View className="flex-1 justify-end bg-black/50">
+        <View className="flex-1 justify-end bg-black/65">
           <View className="bg-white rounded-t-3xl p-6 pb-10">
             <Text className="text-xl font-bold mb-4 text-center">
               Update Call Status
@@ -231,10 +241,10 @@ const CallLog = () => {
               {["pending", "active", "resolved"].map((status) => (
                 <TouchableOpacity
                   key={status}
-                  className={`p-4 rounded-xl flex-row justify-between items-center ${
+                  className={`p-4 rounded-xl flex-row justify-between items-center mb-4 ${
                     selectedCall?.statusByUser === status
-                      ? "bg-secondary-200"
-                      : "bg-gray-100"
+                      ? "bg-primary-200"
+                      : "bg-secondary-200"
                   }`}
                   onPress={() => updateCallStatus(selectedCall?._id, status)}
                   disabled={updatingStatus}
