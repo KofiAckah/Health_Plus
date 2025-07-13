@@ -79,7 +79,8 @@ export const updateEmergencyCallStatusByPersonnel = async (req, res) => {
     const personnelId = req.user.id;
 
     // Validate status
-    if (!["pending", "active", "resolved"].includes(status)) {
+    const validStatuses = ["pending", "active", "resolved"];
+    if (!validStatuses.includes(status)) {
       return res.status(400).json({ msg: "Invalid status value" });
     }
 
@@ -89,41 +90,55 @@ export const updateEmergencyCallStatusByPersonnel = async (req, res) => {
       return res.status(404).json({ msg: "Emergency call not found" });
     }
 
-    // Determine the personnel type (police, fire, health) from their JWT token
-    let personnelType, personnelName, personnelRole;
+    // Determine personnel type based on database (Police vs FireHealth)
+    let personnelDetails;
 
-    // Check if it's a police officer
+    // Check if personnel is in Police database (has soNumber in token)
     if (req.user.soNumber) {
       const officer = await Police.findById(personnelId);
       if (!officer) {
-        return res.status(403).json({ msg: "Personnel not found" });
+        return res
+          .status(403)
+          .json({ msg: "Police officer not found in database" });
       }
-      personnelType = "police";
-      personnelName = officer.name;
-      personnelRole = "Police Officer";
-    } else {
-      // It's a fire/health officer
+      personnelDetails = {
+        type: "police",
+        name: officer.name,
+        role: "Police Officer",
+        serviceType: "Police Service",
+      };
+    }
+    // Check if personnel is in FireHealth database
+    else {
       const fireHealthOfficer = await FireHealth.findById(personnelId);
       if (!fireHealthOfficer) {
-        return res.status(403).json({ msg: "Personnel not found" });
+        return res.status(403).json({ msg: "Personnel not found in database" });
       }
-      personnelType = fireHealthOfficer.role;
-      personnelName = fireHealthOfficer.name;
-      personnelRole =
-        personnelType === "fire" ? "Fire Officer" : "Health Officer";
+
+      // Determine if fire or health based on the role field
+      if (fireHealthOfficer.role === "fire") {
+        personnelDetails = {
+          type: "fire",
+          name: fireHealthOfficer.name,
+          role: "Fire Officer",
+          serviceType: "Fire Service",
+        };
+      } else if (fireHealthOfficer.role === "health") {
+        personnelDetails = {
+          type: "health",
+          name: fireHealthOfficer.name,
+          role: "Health Officer",
+          serviceType: "Ambulance Service",
+        };
+      } else {
+        return res.status(403).json({ msg: "Invalid personnel role" });
+      }
     }
 
-    // Validate that personnel can update this type of call
-    const serviceMap = {
-      police: "Police Service",
-      fire: "Fire Service",
-      health: "Ambulance Service",
-    };
-
-    const matchingService = serviceMap[personnelType];
-    if (call.service !== matchingService) {
+    // Verify personnel is authorized for this type of call
+    if (call.service !== personnelDetails.serviceType) {
       return res.status(403).json({
-        msg: `${personnelRole} is not authorized to update ${call.service} calls`,
+        msg: `${personnelDetails.role} is not authorized to update ${call.service} calls`,
       });
     }
 
@@ -134,8 +149,8 @@ export const updateEmergencyCallStatusByPersonnel = async (req, res) => {
         statusByPersonnel: status,
         lastUpdatedBy: {
           id: personnelId,
-          name: personnelName,
-          role: personnelRole,
+          name: personnelDetails.name,
+          role: personnelDetails.role,
         },
       },
       { new: true }
@@ -158,6 +173,7 @@ export const updateEmergencyCallStatusByPersonnel = async (req, res) => {
       call: updatedCall,
     });
   } catch (err) {
+    console.error("Error updating emergency call status:", err);
     res.status(500).json({
       msg: "Failed to update emergency call status",
       error: err.message,

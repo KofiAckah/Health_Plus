@@ -37,18 +37,19 @@ function EmergencyCalls() {
       setCalls((prev) => [call, ...prev]);
     });
 
-    socket.on(
-      "emergency-call-status-updated",
-      ({ callId, status, officer }) => {
-        setCalls((prev) =>
-          prev.map((call) =>
-            call._id === callId
-              ? { ...call, status, lastUpdatedBy: officer }
-              : call
-          )
-        );
-      }
-    );
+    // Listen for updates to either status
+    socket.on("emergency-call-updated", (updatedCall) => {
+      setCalls((prev) =>
+        prev.map((call) => (call._id === updatedCall._id ? updatedCall : call))
+      );
+    });
+
+    // Listen for user updates to their status
+    socket.on("emergency-call-user-update", (updatedCall) => {
+      setCalls((prev) =>
+        prev.map((call) => (call._id === updatedCall._id ? updatedCall : call))
+      );
+    });
 
     return () => {
       socket.disconnect();
@@ -63,9 +64,9 @@ function EmergencyCalls() {
     return () => clearInterval(interval);
   }, []);
 
-  // Handler for status selection change (open modal)
+  // Handler for personnel status selection change (open modal)
   const handleStatusSelect = (call, value) => {
-    if (value === call.status) return;
+    if (value === call.statusByPersonnel) return;
     setConfirmModal({ open: true, call, newStatus: value });
   };
 
@@ -73,13 +74,18 @@ function EmergencyCalls() {
   const confirmStatusUpdate = async () => {
     const { call, newStatus } = confirmModal;
     try {
+      // Use the personnel-specific endpoint
       await axios.put(
-        `/emergency-call/${call._id}/status`,
+        `/emergency-call/${call._id}/status/personnel`,
         { status: newStatus },
         { withCredentials: true }
       );
+
+      // Update local state
       setCalls((prev) =>
-        prev.map((c) => (c._id === call._id ? { ...c, status: newStatus } : c))
+        prev.map((c) =>
+          c._id === call._id ? { ...c, statusByPersonnel: newStatus } : c
+        )
       );
       setConfirmModal({ open: false, call: null, newStatus: "" });
     } catch (err) {
@@ -93,6 +99,27 @@ function EmergencyCalls() {
   const cancelStatusUpdate = () => {
     setConfirmModal({ open: false, call: null, newStatus: "" });
   };
+
+  // Get status color based on status value
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "pending":
+        return "bg-red-600 text-white";
+      case "active":
+        return "bg-yellow-400 text-black";
+      case "resolved":
+        return "bg-green-400 text-black";
+      default:
+        return "bg-gray-400 text-black";
+    }
+  };
+
+  // Get status badge component
+  const StatusBadge = ({ status }) => (
+    <span className={`px-2 py-1 rounded ${getStatusColor(status)}`}>
+      {status}
+    </span>
+  );
 
   return (
     <div className="p-4">
@@ -109,7 +136,8 @@ function EmergencyCalls() {
               <th>User</th>
               <th>Location</th>
               <th>Time</th>
-              <th>Status</th>
+              <th>User Status</th>
+              <th>Personnel Status</th>
             </tr>
           </thead>
           <tbody>
@@ -145,19 +173,20 @@ function EmergencyCalls() {
                     addSuffix: true,
                   })}
                 </td>
+
+                {/* User Status - Read Only */}
+                <td className="px-2 text-center">
+                  <StatusBadge status={call.statusByUser} />
+                </td>
+
+                {/* Personnel Status - Can be changed */}
                 <td className="px-2 text-center">
                   <select
-                    value={call.status}
+                    value={call.statusByPersonnel}
                     onChange={(e) => handleStatusSelect(call, e.target.value)}
-                    className={`border border-black rounded px-2 py-1 ${
-                      call.status === "pending"
-                        ? "bg-red-600 text-white"
-                        : call.status === "active"
-                        ? "bg-yellow-400 text-black"
-                        : call.status === "resolved"
-                        ? "bg-green-400 text-black"
-                        : ""
-                    }`}
+                    className={`border border-black rounded px-2 py-1 ${getStatusColor(
+                      call.statusByPersonnel
+                    )}`}
                   >
                     {STATUS_OPTIONS.map((opt) => (
                       <option key={opt} value={opt}>
@@ -178,7 +207,7 @@ function EmergencyCalls() {
           <div className="bg-white p-6 rounded shadow-lg max-w-sm w-full">
             <h3 className="text-lg font-bold mb-4">Confirm Status Change</h3>
             <p>
-              Are you sure you want to change the status to{" "}
+              Are you sure you want to change the personnel status to{" "}
               <span className="font-semibold">{confirmModal.newStatus}</span>?
             </p>
             <div className="mt-6 flex justify-end">
