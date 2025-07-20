@@ -58,31 +58,31 @@ async function sendEmergencyCall(service) {
 export const HotlinesData = [
   {
     name: "Fire Service",
-    cell: 911,
+    cell: 192,
     image: require("../../assets/FireLogo.jpg"),
     onPress: async () => {
       await sendEmergencyCall("Fire Service");
-      Linking.openURL("tel:911");
+      Linking.openURL("tel:192");
     },
     color: "#ff0000",
   },
   {
     name: "Police Service",
-    cell: 999,
+    cell: 191,
     image: require("../../assets/PoliceLogo.jpeg"),
     onPress: async () => {
       await sendEmergencyCall("Police Service");
-      Linking.openURL("tel:999");
+      Linking.openURL("tel:191");
     },
     color: "#0000ff",
   },
   {
     name: "Ambulance Service",
-    cell: 112,
+    cell: 193,
     image: require("../../assets/GHSLogo.jpeg"),
     onPress: async () => {
       await sendEmergencyCall("Ambulance Service");
-      Linking.openURL("tel:112");
+      Linking.openURL("tel:193");
     },
     color: "#00ff00",
   },

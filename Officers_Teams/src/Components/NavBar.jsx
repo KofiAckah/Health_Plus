@@ -3,7 +3,8 @@ import { Logo, CompanyName } from "./Default";
 import { Link, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes, faBars } from "@fortawesome/free-solid-svg-icons";
-import { AuthContext } from "../Context/AuthContext"; // Import AuthContext
+import { AuthContext } from "../Context/AuthContext";
+import NotificationBell from "./NotificationBell";
 
 const Links = [
   { name: "Home", path: "/" },
@@ -13,7 +14,7 @@ const Links = [
 
 function NavBar() {
   const [isMenuOpen, setIsMenuOpen] = useState(true);
-  const { isAuthenticated, logout } = useContext(AuthContext); // Get auth state and logout
+  const { isAuthenticated, logout } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const toggleMenu = () => {
@@ -45,6 +46,12 @@ function NavBar() {
               </Link>
             </li>
           ))}
+          {/* Notification Bell */}
+          {isAuthenticated && (
+            <li className="inline-block mx-2">
+              <NotificationBell />
+            </li>
+          )}
           <li className="inline-block mx-2">
             {isAuthenticated ? (
               <button

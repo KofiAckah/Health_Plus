@@ -8,6 +8,8 @@ import FireHealthLogin from "./Pages/Accounts/FireHealthLogin";
 import Loader from "./Components/Loader";
 import NavBar from "./Components/NavBar";
 import EmergencyCalls from "./Pages/EmergencyCalls";
+import { NotificationProvider } from "./Context/NotificationContext";
+import EmergencyPopup from "./Components/EmergencyPopup";
 
 function PrivateRoute({ children }) {
   const { isAuthenticated, loading } = useAuth();
@@ -17,30 +19,35 @@ function PrivateRoute({ children }) {
 
 function App() {
   return (
-    <div className="App">
-      <NavBar />
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <PrivateRoute>
-              <Home />
-            </PrivateRoute>
-          }
-        />
-        <Route path="/about" element={<About />} />
-        <Route path="/officer-login" element={<OfficerLogin />} />
-        <Route path="/firehealth-login" element={<FireHealthLogin />} />
-        <Route
-          path="/emergency-calls"
-          element={
-            <PrivateRoute>
-              <EmergencyCalls />
-            </PrivateRoute>
-          }
-        />
-      </Routes>
-    </div>
+    <NotificationProvider>
+      <div className="App">
+        <NavBar />
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <PrivateRoute>
+                <Home />
+              </PrivateRoute>
+            }
+          />
+          <Route path="/about" element={<About />} />
+          <Route path="/officer-login" element={<OfficerLogin />} />
+          <Route path="/firehealth-login" element={<FireHealthLogin />} />
+          <Route
+            path="/emergency-calls"
+            element={
+              <PrivateRoute>
+                <EmergencyCalls />
+              </PrivateRoute>
+            }
+          />
+        </Routes>
+
+        {/* Global Emergency Popup */}
+        <EmergencyPopup />
+      </div>
+    </NotificationProvider>
   );
 }
 
