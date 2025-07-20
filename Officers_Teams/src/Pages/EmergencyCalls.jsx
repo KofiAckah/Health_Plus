@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { io } from "socket.io-client";
 import formatDistanceToNow from "date-fns/formatDistanceToNow";
+import { Link } from "react-router-dom";
 
 const SOCKET_URL = "http://localhost:5000"; // Adjust if needed
 const STATUS_OPTIONS = ["pending", "active", "resolved"];
@@ -142,6 +143,7 @@ function EmergencyCalls() {
               <th>Time</th>
               <th>User Status</th>
               <th>Personnel Status</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -155,6 +157,8 @@ function EmergencyCalls() {
                   {call.user ? call.user.name : call.name || "Anonymous"}
                   <br />
                   {call.user ? call.user.phone : call.phone || ""}
+                  <br />
+                  {call.user ? call.user.bloodGroup : "No Blood Group"}
                 </td>
                 <td className="px-2">
                   {call.location.address ? (
@@ -198,6 +202,14 @@ function EmergencyCalls() {
                       </option>
                     ))}
                   </select>
+                </td>
+                <td className="px-2 text-center">
+                  <Link
+                    to={`/emergency-calls/${call._id}`}
+                    className="text-blue-500 hover:underline"
+                  >
+                    View Details
+                  </Link>
                 </td>
               </tr>
             ))}

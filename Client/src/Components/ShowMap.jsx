@@ -81,8 +81,8 @@ const ShowMap = ({
     setLoading((prev) => ({ ...prev, [typeKey]: true }));
 
     try {
-      // const apiKey = "YOUR_GOOGLE_MAPS_API_KEY"; // Replace with your actual API key
-      const apiKey = "AIzaSyC6XWEC-80RBMIJKQS5VnKS9keM8D-Dn58";
+      const apiKey = "YOUR_GOOGLE_MAPS_API_KEY"; // Replace with your actual API key
+
       const lat = location.coords.latitude;
       const lng = location.coords.longitude;
       const radius = 10000; // 10km radius

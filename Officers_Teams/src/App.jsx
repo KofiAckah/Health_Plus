@@ -8,6 +8,7 @@ import FireHealthLogin from "./Pages/Accounts/FireHealthLogin";
 import Loader from "./Components/Loader";
 import NavBar from "./Components/NavBar";
 import EmergencyCalls from "./Pages/EmergencyCalls";
+import EmergencyDetails from "./Pages/EmergencyDetails";
 import { NotificationProvider } from "./Context/NotificationContext";
 import EmergencyPopup from "./Components/EmergencyPopup";
 
@@ -39,6 +40,14 @@ function App() {
             element={
               <PrivateRoute>
                 <EmergencyCalls />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/emergency-calls/:id"
+            element={
+              <PrivateRoute>
+                <EmergencyDetails />
               </PrivateRoute>
             }
           />
