@@ -116,7 +116,11 @@ function EmergencyCalls() {
 
   // Get status badge component
   const StatusBadge = ({ status }) => (
-    <span className={`px-2 py-1 rounded ${getStatusColor(status)}`}>
+    <span
+      className={`px-2 py-1 rounded w-20 inline-block ${getStatusColor(
+        status
+      )}`}
+    >
       {status}
     </span>
   );

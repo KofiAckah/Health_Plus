@@ -7,6 +7,8 @@ import { faUser } from "@fortawesome/free-solid-svg-icons";
 import formatDistanceToNow from "date-fns/formatDistanceToNow";
 import { io } from "socket.io-client";
 
+import DataOne from "@/Components/DataOne";
+
 const SOCKET_URL = "http://localhost:5000"; // Adjust if needed
 const STATUS_OPTIONS = ["pending", "active", "resolved"];
 
@@ -99,27 +101,28 @@ function Home() {
       }
     });
 
-    socket.on(
-      "emergency-call-status-updated",
-      ({ callId, status, officer }) => {
-        setCalls((prev) =>
-          prev.map((call) =>
-            call._id === callId
-              ? { ...call, status, lastUpdatedBy: officer }
-              : call
-          )
-        );
-      }
-    );
+    // Listen for updates to either status
+    socket.on("emergency-call-updated", (updatedCall) => {
+      setCalls((prev) =>
+        prev.map((call) => (call._id === updatedCall._id ? updatedCall : call))
+      );
+    });
+
+    // Listen for user updates to their status
+    socket.on("emergency-call-user-update", (updatedCall) => {
+      setCalls((prev) =>
+        prev.map((call) => (call._id === updatedCall._id ? updatedCall : call))
+      );
+    });
 
     return () => {
       socket.disconnect();
     };
   }, [profile?.role]);
 
-  // Handler for status selection change (open modal)
+  // Handler for personnel status selection change (open modal)
   const handleStatusSelect = (call, value) => {
-    if (value === call.status) return;
+    if (value === call.statusByPersonnel) return;
     setConfirmModal({ open: true, call, newStatus: value });
   };
 
@@ -127,16 +130,22 @@ function Home() {
   const confirmStatusUpdate = async () => {
     const { call, newStatus } = confirmModal;
     try {
+      // Use the personnel-specific endpoint
       await axios.put(
-        `/emergency-call/${call._id}/status`,
+        `/emergency-call/${call._id}/status/personnel`,
         { status: newStatus },
         { withCredentials: true }
       );
+
+      // Update local state
       setCalls((prev) =>
-        prev.map((c) => (c._id === call._id ? { ...c, status: newStatus } : c))
+        prev.map((c) =>
+          c._id === call._id ? { ...c, statusByPersonnel: newStatus } : c
+        )
       );
       setConfirmModal({ open: false, call: null, newStatus: "" });
     } catch (err) {
+      console.error("Failed to update status:", err);
       alert("Failed to update status.");
       setConfirmModal({ open: false, call: null, newStatus: "" });
     }
@@ -146,6 +155,31 @@ function Home() {
   const cancelStatusUpdate = () => {
     setConfirmModal({ open: false, call: null, newStatus: "" });
   };
+
+  // Get status color based on status value
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "pending":
+        return "bg-red-600 text-white";
+      case "active":
+        return "bg-yellow-400 text-black";
+      case "resolved":
+        return "bg-green-400 text-black";
+      default:
+        return "bg-gray-400 text-black";
+    }
+  };
+
+  // Get status badge component
+  const StatusBadge = ({ status }) => (
+    <span
+      className={`px-2 py-1 rounded w-20 inline-block ${getStatusColor(
+        status
+      )}`}
+    >
+      {status}
+    </span>
+  );
 
   if (loading) return <Loader />;
 
@@ -177,6 +211,9 @@ function Home() {
         </div>
       </div>
 
+      {/* DataOne Component */}
+      {/* <DataOne /> */}
+
       {/* Emergencies Table */}
       <div className="mt-8">
         <h2 className="text-xl font-bold mb-4">
@@ -192,7 +229,8 @@ function Home() {
                 <th>User</th>
                 <th>Location</th>
                 <th>Time</th>
-                <th>Status</th>
+                <th>User Status</th>
+                <th>Personnel Status</th>
               </tr>
             </thead>
             <tbody>
@@ -228,19 +266,20 @@ function Home() {
                       addSuffix: true,
                     })}
                   </td>
+
+                  {/* User Status - Read Only */}
+                  <td className="px-2 text-center">
+                    <StatusBadge status={call.statusByUser} />
+                  </td>
+
+                  {/* Personnel Status - Can be changed */}
                   <td className="px-2 text-center">
                     <select
-                      value={call.status}
+                      value={call.statusByPersonnel}
                       onChange={(e) => handleStatusSelect(call, e.target.value)}
-                      className={`border border-black rounded px-2 py-1 ${
-                        call.status === "pending"
-                          ? "bg-red-600 text-white"
-                          : call.status === "active"
-                          ? "bg-yellow-400 text-black"
-                          : call.status === "resolved"
-                          ? "bg-green-400 text-black"
-                          : ""
-                      }`}
+                      className={`border border-black rounded px-2 py-1 ${getStatusColor(
+                        call.statusByPersonnel
+                      )}`}
                     >
                       {STATUS_OPTIONS.map((opt) => (
                         <option key={opt} value={opt}>
@@ -258,11 +297,11 @@ function Home() {
 
       {/* Confirmation Modal */}
       {confirmModal.open && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm z-50">
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/40 backdrop-blur-sm">
           <div className="bg-white p-6 rounded shadow-lg max-w-sm w-full">
             <h3 className="text-lg font-bold mb-4">Confirm Status Change</h3>
             <p>
-              Are you sure you want to change the status to{" "}
+              Are you sure you want to change the personnel status to{" "}
               <span className="font-semibold">{confirmModal.newStatus}</span>?
             </p>
             <div className="mt-6 flex justify-end">
