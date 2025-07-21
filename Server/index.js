@@ -51,6 +51,15 @@ app.use(fileUpload());
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });
+
+// Add API key endpoint
+app.get("/config/google-maps-key", (req, res) => {
+  res.json({ apiKey: process.env.GOOGLE_MAPS_API_KEY });
+});
+app.get("/config/gemini-key", (req, res) => {
+  res.json({ apiKey: process.env.GEMINI_API_KEY });
+});
+
 app.use("/account", accountRoutes);
 app.use("/profile", profileRoutes);
 app.use("/issue", issueRoutes);

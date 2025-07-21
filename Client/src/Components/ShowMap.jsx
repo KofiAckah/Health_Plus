@@ -2,6 +2,7 @@ import { View, Text, StyleSheet } from "react-native";
 import { useState, useEffect } from "react";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import * as Location from "expo-location";
+import ConfigService from "../Services/ConfigService";
 
 const ShowMap = ({
   showLocations = { police: false, fire: false, hospital: false },
@@ -9,6 +10,7 @@ const ShowMap = ({
   const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
   const [address, setAddress] = useState("");
+  const [apiKey, setApiKey] = useState("");
   const [places, setPlaces] = useState({
     police: [],
     fire: [],
@@ -19,6 +21,19 @@ const ShowMap = ({
     fire: false,
     hospital: false,
   });
+
+  // Get Google Maps API key from backend
+  useEffect(() => {
+    const fetchApiKey = async () => {
+      try {
+        const key = await ConfigService.getGoogleMapsApiKey();
+        setApiKey(key);
+      } catch (error) {
+        console.error("Failed to fetch Google Maps API key:", error);
+      }
+    };
+    fetchApiKey();
+  }, []);
 
   // Get current location
   useEffect(() => {
@@ -57,9 +72,9 @@ const ShowMap = ({
     })();
   }, []);
 
-  // Effect to load places when showLocations changes
+  // Effect to load places when showLocations changes and API key is available
   useEffect(() => {
-    if (location) {
+    if (location && apiKey) {
       if (showLocations.police && places.police.length === 0) {
         findNearbyPlaces("police");
       }
@@ -70,19 +85,17 @@ const ShowMap = ({
         findNearbyPlaces("hospital");
       }
     }
-  }, [location, showLocations]);
+  }, [location, showLocations, apiKey]);
 
   // Search for nearby places by type
   const findNearbyPlaces = async (type) => {
-    if (!location) return;
+    if (!location || !apiKey) return;
 
     const typeKey = type === "fire_station" ? "fire" : type;
 
     setLoading((prev) => ({ ...prev, [typeKey]: true }));
 
     try {
-      const apiKey = "YOUR_GOOGLE_MAPS_API_KEY"; // Replace with your actual API key
-
       const lat = location.coords.latitude;
       const lng = location.coords.longitude;
       const radius = 10000; // 10km radius
@@ -105,6 +118,9 @@ const ShowMap = ({
         }));
       } else {
         console.error(`Error fetching ${type}:`, result.status);
+        if (result.error_message) {
+          console.error("API Error:", result.error_message);
+        }
       }
     } catch (error) {
       console.error(`Error finding ${type}:`, error);
@@ -126,6 +142,15 @@ const ShowMap = ({
         return "#ff8c00";
     }
   };
+
+  // Don't render map until we have API key
+  if (!apiKey) {
+    return (
+      <View style={styles.loadingContainer}>
+        <Text>Loading map configuration...</Text>
+      </View>
+    );
+  }
 
   return (
     <View
