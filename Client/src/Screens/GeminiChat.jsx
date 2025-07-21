@@ -10,16 +10,14 @@ import {
   FlatList,
   StyleSheet,
 } from "react-native";
-import { useState, useRef } from "react";
-import { GoogleGenAI } from "@google/genai";
+import { useState, useRef, useEffect } from "react";
+// Use the main package import, not the /web path
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
+import ConfigService from "../Services/ConfigService";
 
-const ai = new GoogleGenAI({
-  apiKey: "YOUR_API_KEY_HERE", // Replace with your actual API key
-});
-
-const BOT_AVATAR = "https://cdn-icons-png.flaticon.com/512/4712/4712035.png"; // Example bot avatar
+const BOT_AVATAR = "https://cdn-icons-png.flaticon.com/512/4712/4712035.png";
 
 const GeminiChat = () => {
   const [messages, setMessages] = useState([
@@ -31,10 +29,54 @@ const GeminiChat = () => {
   ]);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
+  const [ai, setAi] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const flatListRef = useRef();
 
+  // Initialize Gemini AI with API key from backend
+  useEffect(() => {
+    const initializeAI = async () => {
+      try {
+        const apiKey = await ConfigService.getGeminiApiKey();
+        console.log("Received API key:", apiKey ? "Yes" : "No"); // Debug log
+
+        if (apiKey) {
+          // Use GoogleGenerativeAI constructor
+          const geminiAI = new GoogleGenerativeAI(apiKey);
+          setAi(geminiAI);
+          console.log("AI initialized successfully"); // Debug log
+        } else {
+          console.error("No Gemini API key available");
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: Date.now(),
+              text: "Sorry, AI service is currently unavailable. Please check your configuration.",
+              sender: "bot",
+            },
+          ]);
+        }
+      } catch (error) {
+        console.error("Failed to initialize AI:", error);
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: Date.now(),
+            text: "Sorry, there was an error initializing the AI service.",
+            sender: "bot",
+          },
+        ]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    initializeAI();
+  }, []);
+
   const handleSend = async () => {
-    if (!input.trim()) return;
+    if (!input.trim() || !ai) return;
+
     const userMsg = {
       id: Date.now(),
       text: input,
@@ -45,24 +87,26 @@ const GeminiChat = () => {
     setSending(true);
 
     try {
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: input,
-      });
+      const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const result = await model.generateContent(input);
+      const response = await result.response;
+      const text = response.text();
+
       setMessages((prev) => [
         ...prev,
         {
           id: Date.now() + 1,
-          text: response.text || "Sorry, I couldn't get a response.",
+          text: text || "Sorry, I couldn't get a response.",
           sender: "bot",
         },
       ]);
     } catch (err) {
+      console.error("Gemini API Error:", err);
       setMessages((prev) => [
         ...prev,
         {
           id: Date.now() + 2,
-          text: "Sorry, something went wrong.",
+          text: "Sorry, something went wrong. Please try again.",
           sender: "bot",
         },
       ]);
@@ -101,25 +145,38 @@ const GeminiChat = () => {
     );
   };
 
+  // Show loading screen while initializing AI
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.loadingContainer}>
+          <Text style={styles.loadingText}>Initializing AI service...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
-        style={{ flex: 1 }}
+        style={styles.keyboardView}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
       >
-        <View className="flex-1">
+        <View style={styles.mainContainer}>
           {/* Header */}
-          <View className="py-6">
-            <Text className="text-center text-2xl font-bold">Chat</Text>
+          <View style={styles.header}>
+            <Text style={styles.headerTitle}>AI Chat</Text>
           </View>
+
           {/* Chat messages */}
           <FlatList
             ref={flatListRef}
             data={messages}
             renderItem={renderMessage}
             keyExtractor={(item) => item.id.toString()}
-            contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 20 }}
+            style={styles.chatList}
+            contentContainerStyle={styles.chatContent}
             onContentSizeChange={() =>
               flatListRef.current?.scrollToEnd({ animated: true })
             }
@@ -127,41 +184,33 @@ const GeminiChat = () => {
               flatListRef.current?.scrollToEnd({ animated: true })
             }
           />
+
           {/* Input box */}
-          <View className="px-4 pb-6 pt-2 bg-white">
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                backgroundColor: "#f3f4f6",
-                borderRadius: 16,
-                paddingHorizontal: 16,
-                paddingVertical: 8,
-              }}
-            >
+          <View style={styles.inputContainer}>
+            <View style={styles.inputWrapper}>
               <TextInput
-                className="flex-1 text-base"
-                style={{ minHeight: 40 }}
+                style={styles.textInput}
                 placeholder="Type a message..."
                 value={input}
                 onChangeText={setInput}
-                editable={!sending}
+                editable={!sending && !!ai}
                 onSubmitEditing={handleSend}
                 returnKeyType="send"
+                multiline={false}
               />
               <TouchableOpacity
                 onPress={handleSend}
-                disabled={sending || !input.trim()}
-                style={{
-                  marginLeft: 8,
-                  backgroundColor: "#379eff",
-                  borderRadius: 12,
-                  paddingHorizontal: 18,
-                  paddingVertical: 8,
-                  opacity: sending || !input.trim() ? 0.5 : 1,
-                }}
+                disabled={sending || !input.trim() || !ai}
+                style={[
+                  styles.sendButton,
+                  {
+                    opacity: sending || !input.trim() || !ai ? 0.5 : 1,
+                  },
+                ]}
               >
-                <Text className="text-white font-semibold text-base">Send</Text>
+                <Text style={styles.sendButtonText}>
+                  {sending ? "Sending..." : "Send"}
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -172,6 +221,42 @@ const GeminiChat = () => {
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#ffffff",
+  },
+  keyboardView: {
+    flex: 1,
+  },
+  mainContainer: {
+    flex: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingText: {
+    fontSize: 18,
+    color: "#333",
+  },
+  header: {
+    paddingVertical: 24,
+    alignItems: "center",
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#333",
+    textAlign: "center",
+  },
+  chatList: {
+    flex: 1,
+  },
+  chatContent: {
+    paddingHorizontal: 16,
+    paddingBottom: 20,
+  },
   botRow: {
     flexDirection: "row",
     alignItems: "flex-end",
@@ -219,6 +304,39 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     overflow: "hidden",
+  },
+  inputContainer: {
+    paddingHorizontal: 16,
+    paddingBottom: 24,
+    paddingTop: 8,
+    backgroundColor: "#ffffff",
+  },
+  inputWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f3f4f6",
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+  textInput: {
+    flex: 1,
+    fontSize: 16,
+    minHeight: 40,
+    maxHeight: 100,
+    paddingVertical: 8,
+  },
+  sendButton: {
+    marginLeft: 8,
+    backgroundColor: "#379eff",
+    borderRadius: 12,
+    paddingHorizontal: 18,
+    paddingVertical: 8,
+  },
+  sendButtonText: {
+    color: "#ffffff",
+    fontWeight: "600",
+    fontSize: 16,
   },
 });
 
