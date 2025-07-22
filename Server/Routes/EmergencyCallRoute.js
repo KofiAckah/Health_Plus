@@ -4,6 +4,7 @@ import {
   getAllEmergencyCalls,
   getCallsByService,
   getCallsByUser,
+  getEmergencyCallById,
   updateEmergencyCallStatusByPersonnel,
   updateEmergencyCallStatusByUser,
 } from "../Controllers/EmergencyCallController.js";
@@ -26,5 +27,6 @@ router.put(
   authMiddleware,
   updateEmergencyCallStatusByUser
 ); // user updates status
+router.get("/:callId", authMiddleware, getEmergencyCallById); // get specific call details
 
 export default router;

@@ -231,3 +231,27 @@ export const updateEmergencyCallStatusByUser = async (req, res) => {
     });
   }
 };
+
+// In Server/Controllers/EmergencyCallController.js - Add this function
+export const getEmergencyCallById = async (req, res) => {
+  try {
+    const { callId } = req.params;
+
+    const call = await EmergencyCall.findById(callId).populate(
+      "user",
+      "name email phone dateOfBirth bloodGroup gender"
+    );
+
+    if (!call) {
+      return res.status(404).json({ msg: "Emergency call not found" });
+    }
+
+    res.status(200).json(call);
+  } catch (err) {
+    console.error("Error fetching emergency call:", err);
+    res.status(500).json({
+      msg: "Failed to fetch emergency call",
+      error: err.message,
+    });
+  }
+};

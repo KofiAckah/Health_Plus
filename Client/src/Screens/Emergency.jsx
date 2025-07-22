@@ -46,34 +46,6 @@ const Emergency = () => {
           <Text className="ml-4 text-xl font-bold">{CompanyName}</Text>
         </View>
 
-        <View className="flex-1 items-center justify-center bg-white p-4">
-          {HotlinesData.map((item, index) => (
-            <TouchableOpacity
-              key={index}
-              onPress={item.onPress}
-              className="w-full rounded-3xl h-20 overflow-hidden mb-4"
-            >
-              <LinearGradient
-                colors={[item.color, "#000"]}
-                className="w-full h-20 rounded-lg relative"
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-              >
-                <View className="flex-1 justify-center ml-8">
-                  <Text className="text-lg text-white">Call {item.name}</Text>
-                  <Text className="text-lg font-bold text-white">
-                    {item.cell}
-                  </Text>
-                </View>
-                <Image
-                  source={item.image}
-                  className="w-20 h-20 absolute right-0 opacity-40"
-                />
-              </LinearGradient>
-            </TouchableOpacity>
-          ))}
-        </View>
-
         {/* Find Nearby Services Section */}
         <View className="px-4 mb-3">
           <Text className="text-xl font-bold mb-3">Find Nearby Services</Text>
@@ -148,6 +120,34 @@ const Emergency = () => {
 
         {/* Map Section */}
         <ShowMap showLocations={showLocations} />
+
+        <View className="flex-1 items-center justify-center bg-white p-4">
+          {HotlinesData.map((item, index) => (
+            <TouchableOpacity
+              key={index}
+              onPress={item.onPress}
+              className="w-full rounded-3xl h-20 overflow-hidden mb-4"
+            >
+              <LinearGradient
+                colors={[item.color, "#000"]}
+                className="w-full h-20 rounded-lg relative"
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+              >
+                <View className="flex-1 justify-center ml-8">
+                  <Text className="text-lg text-white">Call {item.name}</Text>
+                  <Text className="text-lg font-bold text-white">
+                    {item.cell}
+                  </Text>
+                </View>
+                <Image
+                  source={item.image}
+                  className="w-20 h-20 absolute right-0 opacity-40"
+                />
+              </LinearGradient>
+            </TouchableOpacity>
+          ))}
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
