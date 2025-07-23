@@ -73,10 +73,12 @@ const IssueDetails = ({ route, navigation }) => {
     setSelectedImage(image);
     setViewerVisible(true);
   };
+
   const handleViewerClose = () => {
     setViewerVisible(false);
     setSelectedImage(null);
   };
+
   const formatDate = (date) => {
     return formatDistanceToNow(new Date(date), { addSuffix: true });
   };
@@ -119,7 +121,7 @@ const IssueDetails = ({ route, navigation }) => {
               <FontAwesomeIcon icon={faUser} size={26} color="#4a4a4a" />
             </View>
           )}
-          <View>
+          <View className="flex-1">
             <Text className="font-bold text-lg">
               {issue.createdBy?.name || "Unknown User"}
             </Text>
@@ -127,6 +129,32 @@ const IssueDetails = ({ route, navigation }) => {
               {formatDate(issue.createdAt)}
             </Text>
           </View>
+
+          {/* Status badge - only show if hasStatus is true */}
+          {issue.hasStatus && issue.status && (
+            <View
+              className="px-3 py-1 rounded-full"
+              style={{
+                backgroundColor:
+                  issue.status === "Open"
+                    ? "#ef4444"
+                    : issue.status === "In Progress"
+                    ? "#facc15"
+                    : issue.status === "Resolved"
+                    ? "#3b82f6"
+                    : "#e5e7eb",
+              }}
+            >
+              <Text
+                className="text-sm font-semibold"
+                style={{
+                  color: issue.status === "In Progress" ? "#92400e" : "#fff",
+                }}
+              >
+                {issue.status}
+              </Text>
+            </View>
+          )}
         </View>
 
         {/* Title */}
@@ -135,8 +163,8 @@ const IssueDetails = ({ route, navigation }) => {
         {/* Description */}
         <Text className=" text-gray-700 px-4 mt-2">{issue.description}</Text>
 
-        {/* Image */}
-        {issue.issuePicture && (
+        {/* Image - Only render if exists */}
+        {issue.issuePicture && issue.issuePicture.trim() !== "" && (
           <TouchableOpacity
             onPress={() => handleImagePress(issue.issuePicture)}
             className="mt-4 items-center"
@@ -211,12 +239,14 @@ const IssueDetails = ({ route, navigation }) => {
           <AddComment issueId={issue._id} onCommentAdded={fetchIssueDetails} />
         </View>
 
-        {/* Image Viewer Modal */}
-        <ImageViewer
-          visible={viewerVisible}
-          imageUrl={selectedImage}
-          onClose={handleViewerClose}
-        />
+        {/* Image Viewer Modal - Only show if image exists */}
+        {selectedImage && (
+          <ImageViewer
+            visible={viewerVisible}
+            imageUrl={selectedImage}
+            onClose={handleViewerClose}
+          />
+        )}
       </ScrollView>
     </SafeAreaView>
   );

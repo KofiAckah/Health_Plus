@@ -11,10 +11,10 @@ import {
   faVenus,
   faMars,
   faMapMarkerAlt,
-  faExclamationTriangle,
-  faClock,
+  // faExclamationTriangle,
+  // faClock,
   faCheck,
-  faTimes,
+  // faTimes,
 } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 import formatDistanceToNow from "date-fns/formatDistanceToNow";
@@ -175,7 +175,7 @@ function EmergencyDetails() {
                 {call.statusByPersonnel?.charAt(0).toUpperCase() +
                   call.statusByPersonnel?.slice(1) || "Pending"}
               </span>
-              {call.statusByPersonnel !== "resolved" && (
+              {/* {call.statusByPersonnel !== "resolved" && (
                 <button
                   onClick={closeCall}
                   disabled={updatingStatus}
@@ -184,7 +184,7 @@ function EmergencyDetails() {
                   <FontAwesomeIcon icon={faCheck} className="mr-2" />
                   {updatingStatus ? "Closing..." : "Close Call"}
                 </button>
-              )}
+              )} */}
             </div>
           </div>
         </div>

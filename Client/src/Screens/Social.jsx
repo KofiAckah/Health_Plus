@@ -104,7 +104,7 @@ const Social = () => {
                 </Text>
                 <Text className="text-primary-100 text-sm">
                   {formatDistanceToNow(new Date(issue.createdAt), {
-                    addsuffix: true,
+                    addSuffix: true,
                   })}
                 </Text>
               </View>
@@ -115,36 +115,44 @@ const Social = () => {
             {issue.description}
           </Text>
         </TouchableOpacity>
-        <View>
-          <Text
-            className="absolute right-1 px-2 py-1 rounded-b-lg z-10 "
-            style={{
-              backgroundColor:
-                issue.status === "Open"
-                  ? "#ef4444"
-                  : issue.status === "In Progress"
-                  ? "#facc15"
-                  : issue.status === "Resolved"
-                  ? "#3b82f6"
-                  : issue.status === "Closed"
-                  ? "#22c55e"
-                  : "#e5e7eb",
-              color: issue.status === "In Progress" ? "#92400e" : "#fff",
+
+        {/* Only show status if hasStatus is true */}
+        {issue.hasStatus && issue.status && (
+          <View>
+            <Text
+              className="absolute right-1 px-2 py-1 rounded-b-lg z-10 "
+              style={{
+                backgroundColor:
+                  issue.status === "Open"
+                    ? "#ef4444"
+                    : issue.status === "In Progress"
+                    ? "#facc15"
+                    : issue.status === "Resolved"
+                    ? "#3b82f6"
+                    : "#e5e7eb",
+                color: issue.status === "In Progress" ? "#92400e" : "#fff",
+              }}
+            >
+              {issue.status}
+            </Text>
+          </View>
+        )}
+
+        {/* Only render image if it exists */}
+        {issue.issuePicture && issue.issuePicture.trim() !== "" && (
+          <Image
+            source={{ uri: issue.issuePicture }}
+            className="w-full h-64 object-cover"
+            onTouchEnd={() => {
+              setSelectedImage(issue.issuePicture);
+              setViewerVisible(true);
             }}
-          >
-            {issue.status}
-          </Text>
-        </View>
-        <Image
-          source={{ uri: issue.issuePicture }}
-          className="w-full h-64 object-cover"
-          onTouchEnd={() => {
-            setSelectedImage(issue.issuePicture);
-            setViewerVisible(true);
-          }}
-        />
+          />
+        )}
+
         {/* Reaction Section */}
         <ReactToIssue issue={issue} userId={userId} onReacted={fetchIssues} />
+
         {/* Comments Section */}
         <View className="px-4">
           <AddComment issueId={issue._id} onCommentAdded={fetchIssues} />

@@ -90,7 +90,8 @@ const EmergencyPopup = () => {
     if (currentNotification) {
       markAsRead(currentNotification.id);
       // Navigate to emergency calls page or home page
-      navigate("/emergency-calls");
+      // to={`/emergency-calls/${call._id}`}
+      navigate(`/emergency-calls/${currentNotification.call._id}`);
     }
 
     // Stop the alarm sound

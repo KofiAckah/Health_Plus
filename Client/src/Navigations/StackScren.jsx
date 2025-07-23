@@ -3,6 +3,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { NavigationContainer } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ActivityIndicator, View } from "react-native";
+import EditPost from "../Screens/Socials/EditPost";
 
 // Screens
 import BottomTab from "./BottomTab";
@@ -66,6 +67,7 @@ const StackScren = () => {
         <>
           <Stack.Screen name="PostIssue" component={PostIssue} />
           <Stack.Screen name="IssueDetails" component={IssueDetails} />
+          <Stack.Screen name="EditPost" component={EditPost} />
         </>
         {/* Settings Screen */}
         <>

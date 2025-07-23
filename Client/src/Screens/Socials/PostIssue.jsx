@@ -10,9 +10,10 @@ import {
   SafeAreaView,
   ScrollView,
   Alert,
+  Switch,
 } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faTimes } from "@fortawesome/free-solid-svg-icons";
+import { faTimes, faImage, faFlag } from "@fortawesome/free-solid-svg-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
@@ -23,6 +24,7 @@ const PostIssue = () => {
   const [description, setDescription] = useState("");
   const [image, setImage] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [hasStatus, setHasStatus] = useState(false);
 
   // Pick image from gallery
   const pickImage = async () => {
@@ -38,30 +40,60 @@ const PostIssue = () => {
     }
   };
 
+  // Remove selected image
+  const removeImage = () => {
+    setImage(null);
+    // Reset status when image is removed
+    setHasStatus(false);
+  };
+
   // Post issue to backend
   const handlePost = async () => {
-    if (!title.trim() || !description.trim() || !image) {
-      Alert.alert("Error", "Please fill all fields and add an image.");
+    if (!title.trim() || !description.trim()) {
+      Alert.alert("Error", "Please fill in both title and description.");
       return;
     }
+
     setUploading(true);
     try {
       const token = await AsyncStorage.getItem("token");
-      const formData = new FormData();
-      formData.append("title", title);
-      formData.append("description", description);
-      formData.append("issuePicture", {
-        uri: image,
-        name: "issue.jpg",
-        type: "image/jpeg",
-      });
 
-      await axios.post(`${BackendLink}/issue/`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      // Check if we have an image to upload
+      if (image) {
+        // Use FormData for multipart upload when image is present
+        const formData = new FormData();
+        formData.append("title", title);
+        formData.append("description", description);
+        formData.append("hasStatus", hasStatus.toString());
+        formData.append("issuePicture", {
+          uri: image,
+          name: "issue.jpg",
+          type: "image/jpeg",
+        });
+
+        await axios.post(`${BackendLink}/issue/`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+      } else {
+        // Send JSON data when no image - no status when no image
+        await axios.post(
+          `${BackendLink}/issue/`,
+          {
+            title,
+            description,
+            hasStatus: false, // Always false when no image
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+      }
 
       Alert.alert("Success", "Post created!");
       navigation.goBack();
@@ -95,35 +127,23 @@ const PostIssue = () => {
               </Text>
             </TouchableOpacity>
           </View>
-          <View className="w-[90%] mx-auto mb-4 ">
-            <Image
-              source={
-                image ? { uri: image } : require("../../../assets/no image.jpg")
-              }
-              className="w-full h-64 rounded-3xl"
-              style={{ resizeMode: "cover" }}
-            />
-            <TouchableOpacity
-              className="absolute top-2 right-2 bg-white p-2 rounded-2xl shadow"
-              onPress={pickImage}
-            >
-              <Text>{image ? "Change Image" : "Add Image"}</Text>
-            </TouchableOpacity>
-          </View>
-          <View>
+
+          {/* Form Fields */}
+          <View className="px-4">
             <TextInput
-              className="w-[90%] mx-auto bg-secondary-200 p-3 rounded-lg mb-4 placeholder:text-primary-100"
+              className="w-full bg-secondary-200 p-3 rounded-lg mb-4 placeholder:text-primary-100"
               placeholder="Title"
               placeholderTextColor="#b0b8c1"
               multiline
-              numberOfLines={4}
+              numberOfLines={2}
               style={{ textAlignVertical: "top" }}
               value={title}
               onChangeText={setTitle}
               editable={!uploading}
             />
+
             <TextInput
-              className="w-[90%] mx-auto bg-secondary-200 p-3 rounded-lg mb-4 h-28 placeholder:text-primary-100"
+              className="w-full bg-secondary-200 p-3 rounded-lg mb-4 h-28 placeholder:text-primary-100"
               placeholder="Description"
               placeholderTextColor="#b0b8c1"
               multiline
@@ -133,6 +153,97 @@ const PostIssue = () => {
               onChangeText={setDescription}
               editable={!uploading}
             />
+
+            {/* Image Section */}
+            {image ? (
+              <View className="mb-4">
+                <Text className="text-primary-100 text-base font-semibold mb-2">
+                  Selected Image:
+                </Text>
+                <View className="relative">
+                  <Image
+                    source={{ uri: image }}
+                    className="w-full h-64 rounded-lg"
+                    style={{ resizeMode: "cover" }}
+                  />
+                  <TouchableOpacity
+                    className="absolute top-2 right-2 bg-red-500 p-2 rounded-full"
+                    onPress={removeImage}
+                    disabled={uploading}
+                  >
+                    <FontAwesomeIcon icon={faTimes} size={16} color="#fff" />
+                  </TouchableOpacity>
+                </View>
+              </View>
+            ) : (
+              <TouchableOpacity
+                className="w-full bg-secondary-200 p-4 rounded-lg mb-4 flex-row items-center justify-center border-2 border-dashed border-primary-100"
+                onPress={pickImage}
+                disabled={uploading}
+              >
+                <FontAwesomeIcon
+                  icon={faImage}
+                  size={24}
+                  color="#49739c"
+                  style={{ marginRight: 8 }}
+                />
+                <Text className="text-primary-100 text-base font-medium">
+                  Add Image (Optional)
+                </Text>
+              </TouchableOpacity>
+            )}
+
+            {/* Status Toggle Section - Only show when image is present */}
+            {image && (
+              <View className="bg-secondary-200 p-4 rounded-lg mb-4">
+                <View className="flex-row items-center justify-between">
+                  <View className="flex-row items-center flex-1">
+                    <FontAwesomeIcon
+                      icon={faFlag}
+                      size={20}
+                      color="#49739c"
+                      style={{ marginRight: 12 }}
+                    />
+                    <View className="flex-1">
+                      <Text className="text-primary-100 text-base font-semibold">
+                        Add Status Tracking
+                      </Text>
+                      <Text className="text-primary-100 text-sm opacity-70">
+                        Track progress with status (Open, In Progress, Resolved)
+                      </Text>
+                    </View>
+                  </View>
+                  <Switch
+                    value={hasStatus}
+                    onValueChange={setHasStatus}
+                    disabled={uploading}
+                    trackColor={{ false: "#d1d5db", true: "#49739c" }}
+                    thumbColor={hasStatus ? "#ffffff" : "#f3f4f6"}
+                  />
+                </View>
+
+                {hasStatus && (
+                  <View className="mt-3 pt-3 border-t border-gray-300">
+                    <Text className="text-primary-100 text-sm">
+                      Status will be set to "Open" by default
+                    </Text>
+                  </View>
+                )}
+              </View>
+            )}
+
+            {/* Action Buttons */}
+            {image && (
+              <TouchableOpacity
+                className="w-full bg-primary-100 p-3 rounded-lg mb-4"
+                onPress={pickImage}
+                disabled={uploading}
+              >
+                <Text className="text-white text-center font-semibold">
+                  Change Image
+                </Text>
+              </TouchableOpacity>
+            )}
           </View>
         </View>
       </ScrollView>

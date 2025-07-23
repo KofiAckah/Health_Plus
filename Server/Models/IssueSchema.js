@@ -53,27 +53,28 @@ const issueSchema = new mongoose.Schema(
       required: true,
     },
     comments: [commentSchema],
-    // reactions: [reactionSchema],
     reactions: reactionSchema,
     reactedUsers: [reactedUserSchema],
     issuePicture: {
       type: String,
-      required: true,
+      required: false,
+      default: "",
     },
     issuePictureId: {
       type: String,
-      required: true,
+      required: false,
+      default: "",
+    },
+    hasStatus: {
+      type: Boolean,
+      default: false,
     },
     status: {
       type: String,
-      enum: ["Open", "In Progress", "Resolved", "Closed"],
-      default: "Open",
+      enum: ["Open", "In Progress", "Resolved"],
+      required: false, // Make status optional
+      default: undefined, // No default value
     },
-    // priority: {
-    //   type: String,
-    //   enum: ["Low", "Medium", "High"],
-    //   default: "Medium",
-    // },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
