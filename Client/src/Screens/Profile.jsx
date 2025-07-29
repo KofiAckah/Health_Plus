@@ -9,7 +9,7 @@ import {
   RefreshControl,
 } from "react-native";
 import axios from "axios";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import React from "react";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -24,8 +24,9 @@ const Profile = () => {
   const [userPosts, setUserPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [shouldRefreshUser, setShouldRefreshUser] = useState(false);
 
-  const fetchUserData = async () => {
+  const fetchUserData = useCallback(async () => {
     try {
       const token = await AsyncStorage.getItem("token");
       const response = await axios.get(`${BackendLink}/profile`, {
@@ -37,9 +38,9 @@ const Profile = () => {
     } catch (error) {
       console.error("Error fetching user data:", error);
     }
-  };
+  }, []);
 
-  const fetchUserPosts = async () => {
+  const fetchUserPosts = useCallback(async () => {
     try {
       const token = await AsyncStorage.getItem("token");
       const response = await axios.get(`${BackendLink}/issue/user/posts`, {
@@ -53,19 +54,77 @@ const Profile = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   const handleRefresh = async () => {
     setRefreshing(true);
-    await Promise.all([fetchUserData(), fetchUserPosts()]);
+    // Only refresh posts on manual pull-to-refresh
+    await fetchUserPosts();
     setRefreshing(false);
   };
 
-  useFocusEffect(
-    React.useCallback(() => {
+  const handleRefreshUserData = async () => {
+    // Separate function for refreshing user data
+    await fetchUserData();
+    setShouldRefreshUser(false);
+  };
+
+  // Initial load only
+  useEffect(() => {
+    const initializeProfile = async () => {
       setLoading(true);
-      fetchUserData();
-      fetchUserPosts();
+      await Promise.all([fetchUserData(), fetchUserPosts()]);
+      setLoading(false);
+    };
+
+    initializeProfile();
+  }, []);
+
+  // Listen for navigation focus to check if user data should be refreshed
+  useFocusEffect(
+    useCallback(() => {
+      // Check if we're returning from EditProfile
+      const unsubscribe = navigation.addListener("focus", () => {
+        const routeParams = navigation
+          .getState()
+          ?.routes?.find((route) => route.name === "Profile")?.params;
+
+        if (routeParams?.refreshUserData) {
+          handleRefreshUserData();
+          // Clear the param to prevent repeated refreshes
+          navigation.setParams({ refreshUserData: undefined });
+        }
+      });
+
+      return unsubscribe;
+    }, [navigation])
+  );
+
+  // Alternative approach: Listen for a custom event
+  useFocusEffect(
+    useCallback(() => {
+      const checkForUserUpdate = async () => {
+        try {
+          const lastUpdate = await AsyncStorage.getItem(
+            "lastUserProfileUpdate"
+          );
+          const currentUserUpdate = await AsyncStorage.getItem(
+            "currentUserProfileUpdate"
+          );
+
+          if (currentUserUpdate && lastUpdate !== currentUserUpdate) {
+            await handleRefreshUserData();
+            await AsyncStorage.setItem(
+              "lastUserProfileUpdate",
+              currentUserUpdate
+            );
+          }
+        } catch (error) {
+          console.error("Error checking for user updates:", error);
+        }
+      };
+
+      checkForUserUpdate();
     }, [])
   );
 
@@ -73,6 +132,7 @@ const Profile = () => {
     return (
       <SafeAreaView className="flex-1 bg-white justify-center items-center">
         <ActivityIndicator size="large" color="#11D6CD" />
+        <Text onPress={() => navigation.navigate("Login")}>Logout</Text>
       </SafeAreaView>
     );
   }
@@ -129,7 +189,11 @@ const Profile = () => {
         </View>
 
         {/* User Posts Component */}
-        <UserPosts userPosts={userPosts} setUserPosts={setUserPosts} />
+        <UserPosts
+          userPosts={userPosts}
+          setUserPosts={setUserPosts}
+          onRefreshPosts={fetchUserPosts}
+        />
       </ScrollView>
     </SafeAreaView>
   );

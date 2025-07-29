@@ -8,16 +8,49 @@ import {
   Alert,
 } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faUser, faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
-import { useNavigation } from "@react-navigation/native";
+import {
+  faUser,
+  faEdit,
+  faTrash,
+  faSync,
+} from "@fortawesome/free-solid-svg-icons";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { BackendLink } from "./Default";
 import formatDistanceToNow from "date-fns/formatDistanceToNow";
 
-const UserPosts = ({ userPosts, setUserPosts }) => {
+const UserPosts = ({ userPosts, setUserPosts, onRefreshPosts }) => {
   const navigation = useNavigation();
-  const [activeTab, setActiveTab] = useState("all"); // 'all', 'no-images', 'images'
+  const [activeTab, setActiveTab] = useState("all");
+  const [refreshingPosts, setRefreshingPosts] = useState(false);
+
+  // Listen for focus to refresh posts when returning from EditPost
+  useFocusEffect(
+    React.useCallback(() => {
+      const checkForPostUpdate = async () => {
+        try {
+          const lastUpdate = await AsyncStorage.getItem("lastPostUpdate");
+          const currentPostUpdate = await AsyncStorage.getItem(
+            "currentPostUpdate"
+          );
+
+          if (currentPostUpdate && lastUpdate !== currentPostUpdate) {
+            if (onRefreshPosts) {
+              setRefreshingPosts(true);
+              await onRefreshPosts();
+              setRefreshingPosts(false);
+            }
+            await AsyncStorage.setItem("lastPostUpdate", currentPostUpdate);
+          }
+        } catch (error) {
+          console.error("Error checking for post updates:", error);
+        }
+      };
+
+      checkForPostUpdate();
+    }, [onRefreshPosts])
+  );
 
   const handleDeletePost = (postId) => {
     Alert.alert("Delete Post", "Are you sure you want to delete this post?", [
@@ -49,6 +82,14 @@ const UserPosts = ({ userPosts, setUserPosts }) => {
   const handleEditPost = (post) => {
     // Navigate to edit post screen with post data
     navigation.navigate("EditPost", { post });
+  };
+
+  const handleRefreshPosts = async () => {
+    if (onRefreshPosts) {
+      setRefreshingPosts(true);
+      await onRefreshPosts();
+      setRefreshingPosts(false);
+    }
   };
 
   const getFilteredPosts = () => {
@@ -163,7 +204,7 @@ const UserPosts = ({ userPosts, setUserPosts }) => {
 
   return (
     <View>
-      {/* Tab Navigation */}
+      {/* Tab Navigation with Refresh Button */}
       <View className="flex-row border-b border-gray-200 mb-4">
         <TouchableOpacity
           onPress={() => setActiveTab("all")}
@@ -206,6 +247,20 @@ const UserPosts = ({ userPosts, setUserPosts }) => {
           >
             Images
           </Text>
+        </TouchableOpacity>
+
+        {/* Refresh Posts Button */}
+        <TouchableOpacity
+          onPress={handleRefreshPosts}
+          className="px-3 py-3"
+          disabled={refreshingPosts}
+        >
+          <FontAwesomeIcon
+            icon={faSync}
+            size={16}
+            color={refreshingPosts ? "#d1d5db" : "#49739c"}
+            rotation={refreshingPosts ? 180 : 0}
+          />
         </TouchableOpacity>
       </View>
 

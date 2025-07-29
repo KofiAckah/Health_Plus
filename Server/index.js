@@ -36,10 +36,10 @@ app.use(cookieParser());
 app.use(
   cors({
     origin: [
-      "http://10.132.215.220:8081",
-      "http://10.132.215.220:19006",
-      "exp://10.132.215.220:8081",
-      "http://localhost:5173",
+      // "http://10.132.215.220:8081",
+      // "exp://10.132.215.220:8081",
+      "http://localhost:5001", // Officers_Teams
+      "http://localhost:5002", // Client Website
     ],
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true,

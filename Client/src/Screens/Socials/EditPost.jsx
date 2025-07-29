@@ -127,6 +127,9 @@ const EditPost = () => {
         });
       }
 
+      // Set flag to refresh posts in Profile screen
+      await AsyncStorage.setItem("currentPostUpdate", Date.now().toString());
+
       Alert.alert("Success", "Post updated successfully!", [
         { text: "OK", onPress: () => navigation.goBack() },
       ]);

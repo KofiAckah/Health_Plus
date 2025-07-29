@@ -21,7 +21,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
-import { BackendLink, Logo } from "../../Components/Default";
+import { BackendLink } from "../../Components/Default";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Picker } from "@react-native-picker/picker";
@@ -100,7 +100,23 @@ const EditProfile = () => {
           },
         }
       );
-      Alert.alert("Success", "Profile updated!");
+
+      // Set flag to refresh user data in Profile screen
+      await AsyncStorage.setItem(
+        "currentUserProfileUpdate",
+        Date.now().toString()
+      );
+
+      Alert.alert("Success", "Profile updated!", [
+        {
+          text: "OK",
+          onPress: () => {
+            // Simply go back - the Profile screen will automatically refresh
+            // when it detects the AsyncStorage flag change
+            navigation.goBack();
+          },
+        },
+      ]);
     } catch (error) {
       Alert.alert("Error", "Failed to update profile.");
       console.error("Error updating profile:", error);

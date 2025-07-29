@@ -5,14 +5,38 @@ import {
   TouchableOpacity,
   Image,
   SafeAreaView,
+  Animated,
 } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faComment } from "@fortawesome/free-solid-svg-icons";
 import { firstAidTips } from "../Components/FirstAidTips";
 import { useNavigation } from "@react-navigation/native";
+import { useState, useRef } from "react";
 
 const FirstAid = () => {
   const navigation = useNavigation();
+  const [showTooltip, setShowTooltip] = useState(false);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  const handleLongPress = () => {
+    setShowTooltip(true);
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 200,
+      useNativeDriver: true,
+    }).start();
+
+    // Hide tooltip after 2 seconds
+    setTimeout(() => {
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }).start(() => {
+        setShowTooltip(false);
+      });
+    }, 2500);
+  };
 
   return (
     <SafeAreaView className="flex-1">
@@ -53,12 +77,30 @@ const FirstAid = () => {
           ))}
         </View>
       </ScrollView>
-      <TouchableOpacity
-        className="absolute bottom-20 right-6 bg-blue-500 p-3 rounded-full shadow-lg"
-        onPress={() => navigation.navigate("GeminiChat")}
-      >
-        <FontAwesomeIcon icon={faComment} size={20} color="#FFFFFF" />
-      </TouchableOpacity>
+
+      <View className="absolute bottom-20 right-6">
+        {/* Tooltip */}
+        {showTooltip && (
+          <Animated.View
+            style={{ opacity: fadeAnim }}
+            className="absolute bottom-16 right-0 bg-gray-800 px-3 py-2 rounded-lg mb-2 w-20"
+          >
+            <Text className="text-white text-center text-sm font-medium">
+              ChatBot
+            </Text>
+            {/* Triangle pointer */}
+            <View className="absolute -bottom-1 right-6 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-gray-800" />
+          </Animated.View>
+        )}
+
+        <TouchableOpacity
+          className="bg-blue-500 p-3 rounded-full shadow-lg"
+          onPress={() => navigation.navigate("GeminiChat")}
+          onLongPress={handleLongPress}
+        >
+          <FontAwesomeIcon icon={faComment} size={20} color="#FFFFFF" />
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 };
