@@ -1,1 +1,50 @@
 @import "tailwindcss";
+
+@theme {
+  --color-primary-100: #49739c;
+  --color-primary-200: #11d6cd;
+  --color-primary-300: #0d141c;
+  --color-primary-400: #4a6fa1;
+  --color-secondary-100: #0071bd;
+  --color-secondary-200: #e7edf4;
+  --color-secondary-300: #259fb7;
+
+  /* Additional UI variables similar to Officers_Teams */
+  --radius: 0.625rem;
+  --color-background: #ffffff;
+  --color-foreground: #0d141c;
+  --color-card: #ffffff;
+  --color-card-foreground: #0d141c;
+  --color-muted: #f8fafc;
+  --color-muted-foreground: #64748b;
+  --color-border: #e2e8f0;
+  --color-input: #f1f5f9;
+  --color-accent: #e7edf4;
+  --color-accent-foreground: #0d141c;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+      sans-serif;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-white rounded-xl border shadow-sm p-6;
+  }
+
+  .btn-primary {
+    @apply bg-primary-200 hover:bg-primary-100 text-white px-4 py-2 rounded-md transition-colors;
+  }
+
+  .btn-secondary {
+    @apply bg-secondary-200 hover:bg-secondary-100 text-primary-300 px-4 py-2 rounded-md transition-colors;
+  }
+}

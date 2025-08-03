@@ -1,6 +1,6 @@
 import { useState, useContext } from "react";
 import { Logo, CompanyName } from "./Default";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes, faBars } from "@fortawesome/free-solid-svg-icons";
 import { AuthContext } from "../Context/AuthContext";
@@ -16,9 +16,14 @@ function NavBar() {
   const [isMenuOpen, setIsMenuOpen] = useState(true);
   const { isAuthenticated, logout } = useContext(AuthContext);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  const isActiveLink = (path) => {
+    return location.pathname === path;
   };
 
   const handleLogout = async () => {
@@ -40,7 +45,9 @@ function NavBar() {
             <li key={link.name} className="inline-block mx-2">
               <Link
                 to={link.path}
-                className="text-primary-400 hover:text-blue-500 transition-colors"
+                className={`text-primary-400 hover:text-blue-500 transition-colors px-3 py-2 rounded-md ${
+                  isActiveLink(link.path) ? "bg-blue-100" : ""
+                }`}
               >
                 {link.name}
               </Link>
