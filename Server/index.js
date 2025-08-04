@@ -12,6 +12,7 @@ import profileRoutes from "./Routes/ProfileRoute.js";
 import issueRoutes from "./Routes/IssueRoute.js";
 import officerRoutes from "./Routes/OfficerRoute.js";
 import emergencyCallRoutes from "./Routes/EmergencyCallRoute.js";
+import helpRoutes from "./Routes/HelpRoute.js";
 
 dotenv.config();
 
@@ -65,6 +66,7 @@ app.use("/profile", profileRoutes);
 app.use("/issue", issueRoutes);
 app.use("/officer", officerRoutes);
 app.use("/emergency-call", emergencyCallRoutes);
+app.use("/help", helpRoutes);
 
 mongoose
   .connect(process.env.MONGODB_URI)

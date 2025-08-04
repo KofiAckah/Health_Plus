@@ -20,7 +20,7 @@ function NavBar() {
   };
 
   return (
-    <header className="bg-white shadow-md border-b border-secondary-200">
+    <header className="bg-white shadow-md border-b border-secondary-200 sticky top-0 block z-10">
       <nav className="container mx-auto px-4 py-4 flex items-center justify-between">
         {/* Logo */}
         <div className="flex items-center">
