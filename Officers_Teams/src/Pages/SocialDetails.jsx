@@ -152,9 +152,9 @@ function SocialDetails() {
             </button>
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Post Details</h1>
-              <p className="text-sm text-gray-500">
+              {/* <p className="text-sm text-gray-500">
                 View-only mode for officers
-              </p>
+              </p> */}
             </div>
           </div>
           <button
@@ -302,12 +302,12 @@ function SocialDetails() {
           </h3>
 
           {/* Officer Notice */}
-          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          {/* <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
             <p className="text-blue-800 text-sm">
               <strong>Note:</strong> As an officer, you can view comments but
               cannot add new comments or reactions.
             </p>
-          </div>
+          </div> */}
 
           {/* Comments List */}
           {issue.comments && issue.comments.length > 0 ? (

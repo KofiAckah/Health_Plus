@@ -21,7 +21,9 @@ const server = http.createServer(app);
 const io = new SocketIOServer(server, {
   cors: {
     origin: [
-      "http://localhost:5173", // Officers_Teams
+      "http://localhost:5001", // Officers_Teams (Vite dev server)
+      "http://localhost:5173", // Web frontend (Vite dev server)
+      "http://localhost:5002", // Client Website
       "http://10.132.215.220:8081",
       "http://10.132.215.220:19006",
       "exp://10.132.215.220:8081",

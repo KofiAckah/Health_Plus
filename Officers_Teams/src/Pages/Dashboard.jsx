@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
 import formatDistanceToNow from "date-fns/formatDistanceToNow";
 import { io } from "socket.io-client";
+import { Link } from "react-router-dom";
 
 import DataOne from "@/Components/DataOne";
 
@@ -231,6 +232,7 @@ function Dashboard() {
                 <th>Time</th>
                 <th>User Status</th>
                 <th>Personnel Status</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
@@ -244,6 +246,8 @@ function Dashboard() {
                     {call.user ? call.user.name : call.name || "Anonymous"}
                     <br />
                     {call.user ? call.user.phone : call.phone || ""}
+                    <br />
+                    {call.user ? call.user.bloodGroup : "No Blood Group"}
                   </td>
                   <td className="px-2">
                     {call.location.address ? (
@@ -287,6 +291,14 @@ function Dashboard() {
                         </option>
                       ))}
                     </select>
+                  </td>
+                  <td className="px-2 text-center">
+                    <Link
+                      to={`/emergency-calls/${call._id}`}
+                      className="text-blue-500 hover:underline"
+                    >
+                      View Details
+                    </Link>
                   </td>
                 </tr>
               ))}
