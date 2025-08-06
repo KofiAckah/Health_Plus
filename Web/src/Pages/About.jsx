@@ -1,4 +1,4 @@
-import React from "react";
+import { CompanyName } from "../Components/Default";
 
 function About() {
   return (
@@ -8,7 +8,7 @@ function About() {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h1 className="text-4xl font-bold text-gray-800 mb-4">
-              About Health Plus
+              About {CompanyName}
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               We are dedicated to providing comprehensive health and emergency
@@ -27,7 +27,7 @@ function About() {
                 Our Mission
               </h2>
               <p className="text-gray-600 mb-4">
-                Health Plus is committed to revolutionizing emergency response
+                {CompanyName} is committed to revolutionizing emergency response
                 and health management through innovative technology and
                 community-centered solutions.
               </p>

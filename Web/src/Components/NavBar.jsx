@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { CompanyName, Logo } from "./Default";
 
 const Links = [
   { name: "Home", path: "/" },
@@ -24,8 +25,9 @@ function NavBar() {
       <nav className="container mx-auto px-4 py-4 flex items-center justify-between">
         {/* Logo */}
         <div className="flex items-center">
-          <Link to="/" className="text-2xl font-bold text-primary-300">
-            Health Plus
+          <Link to="/" className="text-2xl font-bold text-primary-300 flex">
+            <img src={Logo} alt={CompanyName} className="h-8 mr-2" />
+            {CompanyName}
           </Link>
         </div>
 
@@ -46,7 +48,12 @@ function NavBar() {
             </li>
           ))}
           <li>
-            <button className="btn-primary ml-4">Get Started</button>
+            <button
+              className="btn-primary ml-4"
+              onClick={() => alert("App is not available yet")}
+            >
+              Download App
+            </button>
           </li>
         </ul>
 
@@ -98,7 +105,12 @@ function NavBar() {
               </li>
             ))}
             <li className="pt-2">
-              <button className="btn-primary w-full">Get Started</button>
+              <button
+                className="btn-primary w-full"
+                onClick={() => alert("App is not available yet")}
+              >
+                Download App
+              </button>
             </li>
           </ul>
         </div>
