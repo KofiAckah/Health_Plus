@@ -3,6 +3,8 @@ import "./App.css";
 import useAuth from "./Context/useAuth";
 import Dashboard from "./Pages/Dashboard";
 import Feedback from "./Pages/Feedback";
+import Social from "./Pages/Social";
+import SocialDetails from "./Pages/SocialDetails";
 import OfficerLogin from "./Pages/Accounts/OfficerLogin";
 import FireHealthLogin from "./Pages/Accounts/FireHealthLogin";
 import Loader from "./Components/Loader";
@@ -33,6 +35,8 @@ function App() {
             }
           />
           <Route path="/feedback" element={<Feedback />} />
+          <Route path="/social" element={<Social />} />
+          <Route path="/social/:id" element={<SocialDetails />} />
           <Route path="/officer-login" element={<OfficerLogin />} />
           <Route path="/firehealth-login" element={<FireHealthLogin />} />
           <Route

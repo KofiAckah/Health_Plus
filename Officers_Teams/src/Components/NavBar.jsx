@@ -9,6 +9,7 @@ import NotificationBell from "./NotificationBell";
 const Links = [
   { name: "Dashboard", path: "/" },
   { name: "Feedback", path: "/feedback" },
+  { name: "Social", path: "/social" },
   { name: "Emergencies", path: "/emergency-calls" },
 ];
 
