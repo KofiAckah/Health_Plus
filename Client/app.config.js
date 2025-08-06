@@ -2,7 +2,7 @@ import "dotenv/config";
 
 export default {
   expo: {
-    name: "Health Plus",
+    name: "ResQNow",
     slug: "Client",
     version: "1.0.0",
     orientation: "portrait",

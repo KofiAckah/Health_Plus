@@ -18,7 +18,7 @@ const ROLE_SERVICE_MAP = {
   health: "Ambulance Service",
 };
 
-function Home() {
+function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState(null);
   const [error, setError] = useState(null);
@@ -325,4 +325,4 @@ function Home() {
   );
 }
 
-export default Home;
+export default Dashboard;

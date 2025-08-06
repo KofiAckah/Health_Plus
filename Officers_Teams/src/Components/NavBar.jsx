@@ -7,8 +7,8 @@ import { AuthContext } from "../Context/AuthContext";
 import NotificationBell from "./NotificationBell";
 
 const Links = [
-  { name: "Home", path: "/" },
-  { name: "About", path: "/about" },
+  { name: "Dashboard", path: "/" },
+  { name: "Feedback", path: "/feedback" },
   { name: "Emergencies", path: "/emergency-calls" },
 ];
 
@@ -35,9 +35,9 @@ function NavBar() {
     <div className="sticky top-0 shadow-lg block z-10 bg-white">
       <nav className="flex py-2 max-md:py-3 px-5 justify-between items-center">
         <Link to="/">
-          <div className="flex items-center">
+          <div className="flex items-center justify-center">
             <p className="md:text-3xl text-xl">{CompanyName}</p>
-            <img src={Logo} alt="logo" className="md:w-10 w-7 ml-3" />
+            <img src={Logo} alt="logo" className="md:w-14 w-7" />
           </div>
         </Link>
         <ul className="hidden md:flex items-center">

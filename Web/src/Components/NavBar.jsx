@@ -25,8 +25,11 @@ function NavBar() {
       <nav className="container mx-auto px-4 py-4 flex items-center justify-between">
         {/* Logo */}
         <div className="flex items-center">
-          <Link to="/" className="text-2xl font-bold text-primary-300 flex">
-            <img src={Logo} alt={CompanyName} className="h-8 mr-2" />
+          <Link
+            to="/"
+            className="text-2xl font-bold text-primary-300 flex items-center"
+          >
+            <img src={Logo} alt={CompanyName} className="w-16" />
             {CompanyName}
           </Link>
         </div>

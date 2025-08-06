@@ -42,7 +42,7 @@ const Emergency = () => {
         contentContainerStyle={{ paddingBottom: 96 }}
       >
         <View className="flex-1 flex-row items-center justify-start m-4">
-          <Image source={Logo} className="w-12 h-12" />
+          <Image source={Logo} className="w-16 h-16" />
           <Text className="ml-4 text-xl font-bold">{CompanyName}</Text>
         </View>
 

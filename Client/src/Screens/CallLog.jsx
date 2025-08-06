@@ -176,7 +176,7 @@ const CallLog = () => {
         }}
       >
         <Text
-          className="w-16 p-1 rounded-lg text-center text-white"
+          className="w-[80px] p-1 rounded-lg text-center text-white"
           style={{
             backgroundColor: getStatusColor(call.statusByUser),
           }}

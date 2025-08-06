@@ -1,8 +1,8 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import "./App.css";
 import useAuth from "./Context/useAuth";
-import Home from "./Pages/Home";
-import About from "./Pages/About";
+import Dashboard from "./Pages/Dashboard";
+import Feedback from "./Pages/Feedback";
 import OfficerLogin from "./Pages/Accounts/OfficerLogin";
 import FireHealthLogin from "./Pages/Accounts/FireHealthLogin";
 import Loader from "./Components/Loader";
@@ -28,11 +28,11 @@ function App() {
             path="/"
             element={
               <PrivateRoute>
-                <Home />
+                <Dashboard />
               </PrivateRoute>
             }
           />
-          <Route path="/about" element={<About />} />
+          <Route path="/feedback" element={<Feedback />} />
           <Route path="/officer-login" element={<OfficerLogin />} />
           <Route path="/firehealth-login" element={<FireHealthLogin />} />
           <Route
